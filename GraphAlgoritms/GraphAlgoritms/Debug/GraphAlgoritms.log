@@ -1,0 +1,7 @@
+﻿  Graph.cpp
+C:\Users\Ксения\Documents\универ дз\3 сем\ALGORITMI\CourseWork\GraphAlgoritms\GraphAlgoritms\Graph.h(30,10): error C2143: синтаксическая ошибка: отсутствие ";" перед "*"
+C:\Users\Ксения\Documents\универ дз\3 сем\ALGORITMI\CourseWork\GraphAlgoritms\GraphAlgoritms\Graph.h(30,33): error C2238: непредвиденные лексемы перед ";"
+C:\Users\Ксения\Documents\универ дз\3 сем\ALGORITMI\CourseWork\GraphAlgoritms\GraphAlgoritms\Graph.h(31,10): error C2327: Graph::Iterator: не является именем типа, статическим членом или перечислителем
+C:\Users\Ксения\Documents\универ дз\3 сем\ALGORITMI\CourseWork\GraphAlgoritms\GraphAlgoritms\Graph.h(34,24): warning C4018: <: несоответствие типов со знаком и без знака
+  GraphAlgoritms.cpp
+  Создание кода...
