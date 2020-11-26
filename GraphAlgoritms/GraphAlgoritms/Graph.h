@@ -3,6 +3,7 @@
 #include "dualList.h"
 #include <stdlib.h>
 #include <iostream>
+using namespace std;
 
 class Graph
 {
@@ -11,16 +12,18 @@ private:
 	int V;
 public:
 	Graph(int count = 0){
-		this->V = count;
+		initGraph();
+		/*this->V = count;
 		int** p;
 		p = (int**)malloc(sizeof(int) * count * count);
 		if (!p) {
-			throw std::out_of_range("Allocation error");
+			throw std::out_of_range("Allocation error"); 
+
 			return;
 		}
 		else {
 			G = p;
-		}
+		}*/
 	};
 
 	void initGraph(); 
