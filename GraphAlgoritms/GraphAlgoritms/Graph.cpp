@@ -24,7 +24,7 @@ void Graph::initGraph() {
 
 	//memory
 	int** p;
-	p = (int**)malloc(sizeof(int) * V);
+	p = (int**)malloc(sizeof(int*) * V);
 	if (!p) {
 		throw std::out_of_range("Allocation error");
 		return;
@@ -72,6 +72,7 @@ void Graph::initGraph() {
 		cout << "Sucessfully read." << V << endl;
 		f.close();
 	}
+	Directed = DirectedCheck();
 
 	//felt like checking might delete later
 	for (int i = 0; i < V; i++)
@@ -82,20 +83,44 @@ void Graph::initGraph() {
 	}
 }
 
-/*bool Graph::IfEulerian() {
+bool Graph::DirectedCheck() {
+	for (size_t i = 0; i < V; i++)
+		for (size_t j = i; j < V; j++)
+			if (G[i][j] != G[j][i])
+				return true;
+	return false;
+}
+bool Graph::IfCycle() {
+	Iterator* g_dft_iterator = create_dft_iterator(0);
+	bool* visited = new bool[V];
+	for (size_t i = 0; i < V; i++)
+		visited[i] = false;
+	int cur;
+	while (g_dft_iterator->has_next())
+	{
+		cur = g_dft_iterator->next();
+		visited[cur] = true;
+		for (size_t i = 0; i < V; i++)
+			if ((G[cur][i] == 1) && (visited[i] == true))
+				return true;
+	}
+	return false;
+}
 
+bool Graph::IfEulerian() {
+	return true;
 }
 
 bool Graph::IfBipartite() {
-
+	return true;
 }
 
 bool Graph::IfTree() {
-	
+	return true;
 }
 
 int* Graph::PruferCode() {
-
+	return NULL;
 }
 
 void Graph::PruferDecode(int* PrufC) {
@@ -107,33 +132,31 @@ void Graph::StrongConnected() {
 }
 
 int* Graph::Dijkstra(int A, int B) {
-
+	return NULL;
 }
 
-Iterator* Graph::create_dft_iterator() {
-
-	return new dft_Iterator(G,V);
+Iterator* Graph::create_dft_iterator(int start = 0) {
+	return new dft_Iterator(G,V,start);
 }
 
 bool Graph::dft_Iterator::has_next() {
+    if (!Stack->isEmpty())
+        return true;
     for (size_t i = 0; i < sizeV; i++)
         if (visited[i] == false)
             return true;
-    if (!Stack->isEmpty())
-        return true;
-    else
-        return false;
+    return false;
 }
 
 int Graph::dft_Iterator::next() {
     if (!has_next()) {
         throw std::out_of_range("No more elements");
     }
+	visited[Icurrent] = true;
     int temp = Icurrent;
     for (size_t i = 0; i < sizeV; i++)
         if ((visited[i] == false)&&(ItrG[Icurrent][i]==1))
         {
-            visited[i] = true;
             Icurrent = i;
             Stack->push_back(Icurrent);
             break;
@@ -146,7 +169,6 @@ int Graph::dft_Iterator::next() {
         for (size_t i = 0; i < sizeV; i++)
             if ((visited[i] == false) && (ItrG[backcur][i] == 1))
             {
-                visited[i] = true;
                 Icurrent = i;
                 Stack->push_back(Icurrent);
                 break;
@@ -157,7 +179,6 @@ int Graph::dft_Iterator::next() {
         for (size_t i = 0; i < sizeV; i++)
             if (visited[i] == false)
             {
-                visited[i] = true;
                 Icurrent = i;
                 Stack->push_back(Icurrent);
                 break;
@@ -166,6 +187,47 @@ int Graph::dft_Iterator::next() {
     return temp;
 }
 
-Iterator* Graph::create_bft_iterator() {
-	//return new dft_Iterator(/**);
-}*/
+
+Iterator* Graph::create_bft_iterator(int start = 0) {
+    return new bft_Iterator(G, V,start);
+}
+
+bool Graph::bft_Iterator::has_next() {
+    if (!Queue->isEmpty())
+        return true;
+    for (size_t i = 0; i < sizeV; i++)
+        if (visited[i] == false)
+            return true;
+    return false;
+}
+
+int Graph::bft_Iterator::next() {
+    if (!has_next()) {
+        throw std::out_of_range("No more elements");
+    }
+    visited[Icurrent] = true;
+    int temp = Icurrent;
+    /*На каждом шагу алгоритм берет из начала очереди вершину v и 
+    добавляет все непосещенные смежные с v вершины в was и в конец очереди.*/
+    for (size_t i = 0; i < sizeV; i++)
+		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {
+			Queue->push_back(i);
+		}
+    while (!Queue->isEmpty() && (visited[Icurrent] == true))
+    {
+        Icurrent = Queue->at(0);
+        Queue->pop_front();
+    }
+    if (Queue->isEmpty() && (visited[Icurrent] == true))
+    {
+        for (size_t i = 0; i < sizeV; i++)
+            if (visited[i] == false)
+            {
+                Icurrent = i;
+				Queue->push_back(Icurrent);
+                break;
+            }
+    }
+    return temp;
+}
+
