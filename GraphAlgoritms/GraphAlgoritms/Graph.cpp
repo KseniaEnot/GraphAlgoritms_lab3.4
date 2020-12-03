@@ -72,14 +72,6 @@ void Graph::initGraph() {
 		cout << "Sucessfully read." << V << endl;
 		f.close();
 	}
-
-	//felt like checking might delete later
-	for (int i = 0; i < V; i++)
-	{
-		for (int j = 0; j < V; j++)
-			cout << G[i][j] << " ";
-		cout << endl;
-	}
 }
 
 /*bool Graph::IfEulerian() {
@@ -113,6 +105,17 @@ int* Graph::Dijkstra(int A, int B) {
 Iterator* Graph::create_dft_iterator() {
 
 	return new dft_Iterator(G,V);
+}*/
+
+std::ostream& operator << (std::ostream& out, const Graph& Gr) {
+	cout << "Graph: " << endl;
+	for (int i = 0; i < Gr.V; i++) {
+		for (int j = 0; j < Gr.V; j++) {
+			cout << Gr.G[i][j] << " ";
+		}
+		cout << endl;
+	}
+	return out;
 }
 
 bool Graph::dft_Iterator::has_next() {
@@ -166,6 +169,6 @@ int Graph::dft_Iterator::next() {
     return temp;
 }
 
-Iterator* Graph::create_bft_iterator() {
+//Iterator* Graph::create_bft_iterator() {
 	//return new dft_Iterator(/**);
-}*/
+//}
