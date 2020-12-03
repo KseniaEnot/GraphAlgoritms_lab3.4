@@ -37,6 +37,7 @@ public:
 	void PruferDecode(int*);
 	void StrongConnected();
 	int* Dijkstra(int,int);
+	friend std::ostream& operator << (std::ostream&, const Graph&);
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
 	Iterator* create_bft_iterator(int); // breadth-first traverse iterator
 
@@ -99,7 +100,6 @@ public:
 	~Graph() {
 		for (size_t i = 0; i < V; i++)
 			free(G[i]);
-		free(G);
 	}
 
 };

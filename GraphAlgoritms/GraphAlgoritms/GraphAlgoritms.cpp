@@ -6,6 +6,8 @@ int main()
 {
     std::cout << "Hello World!\n";
     Graph g;
+    cout << g;
+    cout << "ok";
     Iterator* g_dft_iterator = g.create_dft_iterator(0);
     while (g_dft_iterator->has_next())
     {
@@ -18,4 +20,5 @@ int main()
         std::cout << g_bft_iterator->next() << " ";
     }
     std::cout << std::endl;
+
 }
