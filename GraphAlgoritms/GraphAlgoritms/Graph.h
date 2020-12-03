@@ -16,17 +16,6 @@ private:
 public:
 	Graph(int count = 0){
 		initGraph();
-		/*this->V = count;
-		int** p;
-		p = (int**)malloc(sizeof(int) * count * count);
-		if (!p) {
-			throw std::out_of_range("Allocation error"); 
-
-			return;
-		}
-		else {
-			G = p;
-		}*/
 	};
 
 	void initGraph(); 
@@ -100,6 +89,6 @@ public:
 	~Graph() {
 		for (size_t i = 0; i < V; i++)
 			free(G[i]);
+		free(G);
 	}
-
 };
