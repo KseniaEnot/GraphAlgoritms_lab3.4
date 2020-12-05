@@ -72,7 +72,6 @@ void Graph::initGraph() {
 		cout << "Sucessfully read." << V << endl;
 		f.close();
 	}
-	return out;
 	Directed = DirectedCheck();
 }
 
@@ -105,6 +104,39 @@ bool Graph::IfEulerian() {
 }
 
 bool Graph::IfBipartite() {
+	int* color = new int[V];
+	for (size_t i = 0; i < V; i++)
+		color[i] = 2; //1-black,0-white,2-grey
+	Iterator* g_bft_iterator = create_bft_iterator(0);
+	int cur;
+	while (g_bft_iterator->has_next())
+	{
+		if (g_bft_iterator->newconnection())
+		{
+			cur = g_bft_iterator->next();
+			color[cur] = 1;
+		}
+		else
+			cur = g_bft_iterator->next();
+		for (size_t i = 0; i < V; i++)
+			if (G[cur][i] == 1)
+			{
+				switch (color[i])
+				{
+				case 2:
+					if (color[cur] == 1)
+						color[i] = 0;
+					else color[i] = 1;
+					break;
+				default:
+					if (color[i] == color[cur])
+					{
+						return false;
+					}
+					break;
+				}
+			}
+	}
 	return true;
 }
 
@@ -144,18 +176,18 @@ std::ostream& operator << (std::ostream& out, const Graph& Gr) {
 }
 
 bool Graph::dft_Iterator::has_next() {
-    if (!Stack->isEmpty())
-        return true;
-    for (size_t i = 0; i < sizeV; i++)
-        if (visited[i] == false)
-            return true;
-    return false;
+	if (!Stack->isEmpty())
+		return true;
+	for (size_t i = 0; i < sizeV; i++)
+		if (visited[i] == false)
+			return true;
+	return false;
 }
 
 int Graph::dft_Iterator::next() {
-    if (!has_next()) {
-        throw std::out_of_range("No more elements");
-    }
+	if (!has_next()) {
+		throw std::out_of_range("No more elements");
+	}
 	visited[Icurrent] = true;
     int temp = Icurrent;
     for (size_t i = 0; i < sizeV; i++)
@@ -163,6 +195,7 @@ int Graph::dft_Iterator::next() {
         {
             Icurrent = i;
             Stack->push_back(Icurrent);
+			connection = false;
             break;
         }
     int backcur;
@@ -175,6 +208,7 @@ int Graph::dft_Iterator::next() {
             {
                 Icurrent = i;
                 Stack->push_back(Icurrent);
+				connection = false;
                 break;
             }
     }
@@ -185,10 +219,15 @@ int Graph::dft_Iterator::next() {
             {
                 Icurrent = i;
                 Stack->push_back(Icurrent);
+				connection = true;
                 break;
             }
     }
     return temp;
+}
+
+bool Graph::dft_Iterator::newconnection() {
+	return connection;
 }
 
 Iterator* Graph::create_bft_iterator(int start = 0) {
@@ -196,22 +235,20 @@ Iterator* Graph::create_bft_iterator(int start = 0) {
 }
 
 bool Graph::bft_Iterator::has_next() {
-    if (!Queue->isEmpty())
-        return true;
-    for (size_t i = 0; i < sizeV; i++)
-        if (visited[i] == false)
-            return true;
-    return false;
+	if (!Queue->isEmpty())
+		return true;
+	for (size_t i = 0; i < sizeV; i++)
+		if (visited[i] == false)
+			return true;
+	return false;
 }
 
 int Graph::bft_Iterator::next() {
-    if (!has_next()) {
-        throw std::out_of_range("No more elements");
-    }
+	if (!has_next()) {
+		throw std::out_of_range("No more elements");
+	}
     visited[Icurrent] = true;
     int temp = Icurrent;
-    /*На каждом шагу алгоритм берет из начала очереди вершину v и 
-    добавляет все непосещенные смежные с v вершины в was и в конец очереди.*/
     for (size_t i = 0; i < sizeV; i++)
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {
 			Queue->push_back(i);
@@ -219,6 +256,7 @@ int Graph::bft_Iterator::next() {
     while (!Queue->isEmpty() && (visited[Icurrent] == true))
     {
         Icurrent = Queue->at(0);
+		connection = false;
         Queue->pop_front();
     }
     if (Queue->isEmpty() && (visited[Icurrent] == true))
@@ -228,9 +266,14 @@ int Graph::bft_Iterator::next() {
             {
                 Icurrent = i;
 				Queue->push_back(Icurrent);
+				connection = true;
                 break;
             }
     }
     return temp;
+}
+
+bool  Graph::bft_Iterator::newconnection() {
+	return connection;
 }
 
