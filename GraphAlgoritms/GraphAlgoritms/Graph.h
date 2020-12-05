@@ -38,6 +38,7 @@ public:
 		dualList* Stack;
 		int Icurrent;
 		int sizeV;
+		bool connection;
 	public:
 		dft_Iterator(int** Gr, int max, int start = 0) {
 			Stack = new dualList();
@@ -49,9 +50,11 @@ public:
 			for (size_t i = 0; i < max; i++)
 				visited[i] = false;
 			visited[Icurrent] = true;
+			connection = true;
 		};
 		int next();
 		bool has_next();
+		bool newconnection();
 		~dft_Iterator() {
 			delete visited;
 			delete* ItrG;
@@ -66,6 +69,7 @@ public:
 		dualList* Queue;
 		int Icurrent;
 		int sizeV;
+		bool connection;
 	public:
 		bft_Iterator(int** Gr, int max, int start = 0) {
 			Queue = new dualList();
@@ -77,9 +81,11 @@ public:
 			for (size_t i = 0; i < max; i++)
 				visited[i] = false;
 			visited[Icurrent] = true;
+			connection = true;
 		};
 		int next();
 		bool has_next();
+		bool newconnection();
 		~bft_Iterator() {
 			delete visited;
 			delete* ItrG; 
