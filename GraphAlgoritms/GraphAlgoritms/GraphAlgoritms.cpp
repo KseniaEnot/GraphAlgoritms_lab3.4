@@ -9,7 +9,9 @@ int main()
     cout << g;
     cout << "ok";
     std::cout << std::endl;
-    int cur;
+    g.PruferCode();
+
+    /*int cur;
     Iterator* g_bft_iterator = g.create_bft_iterator(0);
     while (g_bft_iterator->has_next())
     {
@@ -28,6 +30,6 @@ int main()
         std::cout << "next " << g_dft_iterator->next() << " ";
         cout << "has_next " << g_dft_iterator->has_next() << " ";
         cout << "connect " << g_dft_iterator->newconnection() << "\n";
-    }    
+    }*/    
 
 }

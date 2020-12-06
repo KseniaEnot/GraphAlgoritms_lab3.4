@@ -179,11 +179,52 @@ bool Graph::IfBipartite() {
 }
 
 bool Graph::IfTree() {
+	//check connectivity
+	Iterator* g_dft_iterator = create_dft_iterator(0);
+	while (g_dft_iterator->has_next())
+	{
+		g_dft_iterator->next();
+		if (g_dft_iterator->newconnection()) return false;
+	}
+	//check acycling
+	if (IfCycle()) return false;
 	return true;
 }
 
 int* Graph::PruferCode() {
-	return NULL;
+	if (!IfTree() || Directed) throw std::invalid_argument("Invalid Graph Type");
+	if (V <= 2) return NULL;
+	int* PrufC = new int[V - 2]; 
+	int** G_copy = new int*[V];
+	for (int i = 0; i < V; i++)
+	{
+		G_copy[i] = new int[V];
+		for (int j = 0; j < V; j++)
+			G_copy[i][j] = G[i][j];
+	}
+	
+	int cur_ver = 0, connect_num = 0, next_ver = 0, cur_Pruf = 0;
+	bool exit = false;
+	while (cur_Pruf < V - 2) {
+		for (int j = 0; j < V; j++) {
+			if (G_copy[cur_ver][j] == 1) {
+				connect_num++;
+				if (connect_num > 1) { cur_ver++; exit = true; break; }
+				next_ver = j;
+			}
+		}
+		if (!exit) {
+				G_copy[next_ver][cur_ver] = 0;
+				G_copy[cur_ver][next_ver] = 0;
+				PrufC[cur_Pruf] = next_ver;
+				cout << next_ver << " ";
+				if (next_ver < cur_ver) cur_ver = next_ver;
+				else cur_ver++;
+				cur_Pruf++;
+		}
+		connect_num = 0, next_ver = 0; exit = false;
+	}
+	return PrufC;
 }
 
 void Graph::PruferDecode(int* PrufC) {
