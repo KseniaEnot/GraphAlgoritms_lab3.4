@@ -142,6 +142,39 @@ bool Graph::IfEulerian() {
 }
 
 bool Graph::IfBipartite() {
+	int* color = new int[V];
+	for (size_t i = 0; i < V; i++)
+		color[i] = 2; //1-black,0-white,2-grey
+	Iterator* g_bft_iterator = create_bft_iterator(0);
+	int cur;
+	while (g_bft_iterator->has_next())
+	{
+		if (g_bft_iterator->newconnection())
+		{
+			cur = g_bft_iterator->next();
+			color[cur] = 1;
+		}
+		else
+			cur = g_bft_iterator->next();
+		for (size_t i = 0; i < V; i++)
+			if (G[cur][i] == 1)
+			{
+				switch (color[i])
+				{
+				case 2:
+					if (color[cur] == 1)
+						color[i] = 0;
+					else color[i] = 1;
+					break;
+				default:
+					if (color[i] == color[cur])
+					{
+						return false;
+					}
+					break;
+				}
+			}
+	}
 	return true;
 }
 
