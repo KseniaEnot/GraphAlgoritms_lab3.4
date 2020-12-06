@@ -8,19 +8,26 @@ int main()
     Graph g;
     cout << g;
     cout << "ok";
-   /* Iterator* g_dft_iterator = g.create_dft_iterator(0);
-    while (g_dft_iterator->has_next())
-    {
-        std::cout << g_dft_iterator->next() << " ";
-    }*/
     std::cout << std::endl;
     int cur;
     Iterator* g_bft_iterator = g.create_bft_iterator(0);
     while (g_bft_iterator->has_next())
     {
-        std::cout << g_bft_iterator->next() << " ";
+        std::cout << "next " << g_bft_iterator->next() << " ";
+        cout << "has_next " << g_bft_iterator->has_next() << " ";
+        cout << "connect " << g_bft_iterator->newconnection() << "\n";
     }
-    std::cout << std::endl;
+     std::cout << std::endl;
     std::cout << g.IfBipartite() << std::endl;
     std::cout << std::endl;
+    cout << "ok\n";
+    cout << endl << g.IfEulerian();
+    Iterator* g_dft_iterator = g.create_dft_iterator(0);
+    while (g_dft_iterator->has_next() != 0)
+    {
+        std::cout << "next " << g_dft_iterator->next() << " ";
+        cout << "has_next " << g_dft_iterator->has_next() << " ";
+        cout << "connect " << g_dft_iterator->newconnection() << "\n";
+    }    
+
 }

@@ -46,6 +46,7 @@ void Graph::initGraph() {
 				int temp; cin >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
 				else { throw std::invalid_argument("Input error"); V = 0; } //+clean graph to 0??????????
+				if (i == j) G[i][j] = 0;
 			}
 		}
 		cout << "Sucessfully read.\n";
@@ -67,6 +68,7 @@ void Graph::initGraph() {
 				int temp; f >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
 				else { throw std::invalid_argument("Input error"); V = 0; } //+clean graph to 0????????????
+				if (i == j) G[i][j] = 0;
 			}
 		}
 		cout << "Sucessfully read." << V << endl;
@@ -82,7 +84,12 @@ bool Graph::DirectedCheck() {
 				return true;
 	return false;
 }
+
 bool Graph::IfCycle() {
+	if (Directed) {
+		//not checking - not in our plan
+		throw std::invalid_argument("Invalid Graph Type");
+	}
 	Iterator* g_dft_iterator = create_dft_iterator(0);
 	bool* visited = new bool[V];
 	for (size_t i = 0; i < V; i++)
@@ -100,6 +107,37 @@ bool Graph::IfCycle() {
 }
 
 bool Graph::IfEulerian() {
+	//check for connections
+	Iterator* g_dft_iterator = create_dft_iterator(0);
+	int max_connect = 0, cur_connect = 0;
+	while (g_dft_iterator->has_next())
+	{
+		std::cout << g_dft_iterator->next() << " ";
+		if (!g_dft_iterator->newconnection()) cur_connect++;
+		else {
+			if (max_connect > 1) { if (cur_connect > 1) return false; }
+			if (cur_connect > max_connect) max_connect = cur_connect;
+			cur_connect = 0;
+		}
+	}
+	cout << cur_connect << " " << max_connect << endl;
+	if (cur_connect > 1 && max_connect > 1) return false;
+
+	//count
+	int* count_rows, *count_col;
+	count_rows = new int[V];
+	count_col = new int[V];
+	for (int j = 0; j < V; j++) count_col[j] = 0;
+	for (int i = 0; i < V; i++) {
+		count_rows[i] = 0;
+		for (int j = 0; j < V; j++) {
+			if (G[i][j] == 1) { count_rows[i]++; count_col[j]++; }
+		}
+	}
+
+	for (int i = 0; i < V; i++)
+		if (!Directed && (count_col[i] + count_rows[i]) % 2 != 0) return false;
+		else if (Directed && (count_col[i] != count_rows[i])) return false;
 	return true;
 }
 
@@ -189,49 +227,49 @@ int Graph::dft_Iterator::next() {
 		throw std::out_of_range("No more elements");
 	}
 	visited[Icurrent] = true;
-    int temp = Icurrent;
-    for (size_t i = 0; i < sizeV; i++)
-        if ((visited[i] == false)&&(ItrG[Icurrent][i]==1))
-        {
-            Icurrent = i;
-            Stack->push_back(Icurrent);
+	int temp = Icurrent;
+	for (size_t i = 0; i < sizeV; i++)
+		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1))
+		{
+			Icurrent = i;
+			Stack->push_back(Icurrent);
 			connection = false;
-            break;
-        }
-    int backcur;
-    while ((temp == Icurrent)&& !Stack->isEmpty())
-    {
-        backcur=Stack->at(Stack->get_size() - 1);
-        Stack->pop_back();
-        for (size_t i = 0; i < sizeV; i++)
-            if ((visited[i] == false) && (ItrG[backcur][i] == 1))
-            {
-                Icurrent = i;
-                Stack->push_back(Icurrent);
+			break;
+		}
+	int backcur;
+	while ((temp == Icurrent) && !Stack->isEmpty())
+	{
+		backcur = Stack->at(Stack->get_size() - 1);
+		Stack->pop_back();
+		for (size_t i = 0; i < sizeV; i++)
+			if ((visited[i] == false) && (ItrG[backcur][i] == 1))
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
 				connection = false;
-                break;
-            }
-    }
-    if (temp == Icurrent)
-    {
-        for (size_t i = 0; i < sizeV; i++)
-            if (visited[i] == false)
-            {
-                Icurrent = i;
-                Stack->push_back(Icurrent);
+				break;
+			}
+	}
+	if (temp == Icurrent)
+	{
+		for (size_t i = 0; i < sizeV; i++)
+			if (visited[i] == false)
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
 				connection = true;
-                break;
-            }
-    }
-    return temp;
+				break;
+			}
+	}
+	return temp;
 }
 
-bool Graph::dft_Iterator::newconnection() {
+bool  Graph::dft_Iterator::newconnection() {
 	return connection;
 }
 
 Iterator* Graph::create_bft_iterator(int start = 0) {
-    return new bft_Iterator(G, V,start);
+	return new bft_Iterator(G, V, start);
 }
 
 bool Graph::bft_Iterator::has_next() {
@@ -247,30 +285,30 @@ int Graph::bft_Iterator::next() {
 	if (!has_next()) {
 		throw std::out_of_range("No more elements");
 	}
-    visited[Icurrent] = true;
-    int temp = Icurrent;
-    for (size_t i = 0; i < sizeV; i++)
+	visited[Icurrent] = true;
+	int temp = Icurrent;
+	for (size_t i = 0; i < sizeV; i++)
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {
 			Queue->push_back(i);
 		}
-    while (!Queue->isEmpty() && (visited[Icurrent] == true))
-    {
-        Icurrent = Queue->at(0);
+	while (!Queue->isEmpty() && (visited[Icurrent] == true))
+	{
+		Icurrent = Queue->at(0);
 		connection = false;
-        Queue->pop_front();
-    }
-    if (Queue->isEmpty() && (visited[Icurrent] == true))
-    {
-        for (size_t i = 0; i < sizeV; i++)
-            if (visited[i] == false)
-            {
-                Icurrent = i;
+		Queue->pop_front();
+	}
+	if (Queue->isEmpty() && (visited[Icurrent] == true))
+	{
+		for (size_t i = 0; i < sizeV; i++)
+			if (visited[i] == false)
+			{
+				Icurrent = i;
 				Queue->push_back(Icurrent);
 				connection = true;
-                break;
-            }
-    }
-    return temp;
+				break;
+			}
+	}
+	return temp;
 }
 
 bool  Graph::bft_Iterator::newconnection() {
