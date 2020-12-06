@@ -10,7 +10,6 @@ int main()
     cout << "ok";
     std::cout << std::endl;
     g.PruferCode();
-
     /*int cur;
     Iterator* g_bft_iterator = g.create_bft_iterator(0);
     while (g_bft_iterator->has_next())

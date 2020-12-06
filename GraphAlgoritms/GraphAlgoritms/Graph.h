@@ -13,6 +13,7 @@ private:
 	bool Directed;
 	bool DirectedCheck();
 	bool IfCycle();
+	void QuickSort(int L, int R, int* arr);
 public:
 	Graph(int count = 0){
 		initGraph();
@@ -38,6 +39,7 @@ public:
 		dualList* Stack;
 		int Icurrent;
 		int sizeV;
+		int before;
 		bool connection;
 	public:
 		dft_Iterator(int** Gr, int max, int start = 0) {
@@ -50,11 +52,13 @@ public:
 			for (size_t i = 0; i < max; i++)
 				visited[i] = false;
 			visited[Icurrent] = true;
+			before = -1;
 			connection = true;
 		};
 		int next();
 		bool has_next();
 		bool newconnection();
+		int beforecur();
 		~dft_Iterator() {
 			delete visited;
 			delete* ItrG;
@@ -69,6 +73,7 @@ public:
 		dualList* Queue;
 		int Icurrent;
 		int sizeV;
+		int before = -1;
 		bool connection;
 	public:
 		bft_Iterator(int** Gr, int max, int start = 0) {
@@ -86,6 +91,7 @@ public:
 		int next();
 		bool has_next();
 		bool newconnection();
+		int beforecur(); //???
 		~bft_Iterator() {
 			delete visited;
 			delete* ItrG; 

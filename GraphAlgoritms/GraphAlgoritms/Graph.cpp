@@ -77,6 +77,32 @@ void Graph::initGraph() {
 	Directed = DirectedCheck();
 }
 
+void Graph::QuickSort(int L, int R, int* arr)
+{
+	int x = arr[(R + L) / 2]; //choose the middle element as a pivot
+	int swapbuf;
+	int i = L, j = R;
+	do
+	{
+		while (arr[i] < x)//looking for an element smaller than the pivot
+			i++;
+		while (arr[j] > x)//looking for an element bigger than the pivot
+			j--;
+		if (i <= j) // swap
+		{
+			swapbuf = arr[i];
+			arr[i] = arr[j];
+			arr[j] = swapbuf;
+			i++;
+			j--;
+		}
+	} while (i < j);
+	if (i < R) //if they did not go beyond the bounds of the array
+		QuickSort(i, R, arr);
+	if (j > L)
+		QuickSort(L, j, arr);
+}
+
 bool Graph::DirectedCheck() {
 	for (size_t i = 0; i < V; i++)
 		for (size_t j = i; j < V; j++)
@@ -87,23 +113,39 @@ bool Graph::DirectedCheck() {
 
 bool Graph::IfCycle() {
 	if (Directed) {
-		//not checking - not in our plan
-		throw std::invalid_argument("Invalid Graph Type");
-	}
-	Iterator* g_dft_iterator = create_dft_iterator(0);
-	bool* visited = new bool[V];
-	for (size_t i = 0; i < V; i++)
-		visited[i] = false;
-	int cur;
-	while (g_dft_iterator->has_next())
-	{
-		cur = g_dft_iterator->next();
-		visited[cur] = true;
+		Iterator* g_dft_iterator = create_dft_iterator(0);
+		bool* visited = new bool[V];
 		for (size_t i = 0; i < V; i++)
-			if ((G[cur][i] == 1) && (visited[i] == true))
-				return true;
+			visited[i] = false;
+		int cur;
+		while (g_dft_iterator->has_next())
+		{
+			cur = g_dft_iterator->next();
+			visited[cur] = true;
+			for (size_t i = 0; i < V; i++)
+				if ((G[cur][i] == 1) && (visited[i] == true))
+					return true;
+		}
+		return false;
 	}
-	return false;
+	else {
+		Iterator* g_dft_iterator = create_dft_iterator(0);
+		bool* visited = new bool[V];
+		for (size_t i = 0; i < V; i++)
+			visited[i] = false;
+		int cur,bef;
+		while (g_dft_iterator->has_next())
+		{
+			bef = g_dft_iterator->beforecur();
+			cur = g_dft_iterator->next();
+			visited[cur] = true;
+			for (size_t i = 0; i < V; i++)
+				if ((G[cur][i] == 1) && (visited[i] == true) && (i != bef))
+					return true;
+		}
+		return false;
+	}
+	
 }
 
 bool Graph::IfEulerian() {
@@ -179,15 +221,36 @@ bool Graph::IfBipartite() {
 }
 
 bool Graph::IfTree() {
-	//check connectivity
-	Iterator* g_dft_iterator = create_dft_iterator(0);
-	while (g_dft_iterator->has_next())
-	{
-		g_dft_iterator->next();
-		if (g_dft_iterator->newconnection()) return false;
-	}
-	//check acycling
 	if (IfCycle()) return false;
+	Iterator* g_dft_iterator = create_dft_iterator(0);
+	if (Directed)
+	{
+		int countDeg;
+		int count = 0;
+		for (size_t i = 0; i < V; i++)
+		{
+			countDeg = 0;
+			for (size_t j = 0; j < V; j++)
+				countDeg += G[j][i];
+			if (countDeg>1)
+			{
+				return false;
+			}
+			else if (countDeg==0)
+			{
+				count++;
+				if (count > 1)
+					return false;
+			}
+		}
+	}
+	else {
+		while (g_dft_iterator->has_next())
+		{
+			g_dft_iterator->next();
+			if (g_dft_iterator->newconnection()) return false;
+		}
+	}
 	return true;
 }
 
@@ -232,7 +295,12 @@ void Graph::PruferDecode(int* PrufC) {
 }
 
 void Graph::StrongConnected() {
-
+	/*
+	1.����������� ���� ��������� ���������������� �����.
+	2.��������� ����� � ������� �� ���� ��������� �����, ���������, � ����� ������� �������� �� ������.
+	3.��������� ����� � ������� �� �������� �����, � ��������� ��� ������� �� ��������� ������� �
+	������������ ������� � �������, ���������� � �.2.
+	4.���������� �� �.3 ������� � �������� ������ �������� ������������.*/
 }
 
 int* Graph::Dijkstra(int A, int B) {
@@ -272,6 +340,7 @@ int Graph::dft_Iterator::next() {
 	for (size_t i = 0; i < sizeV; i++)
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1))
 		{
+			before = Icurrent;
 			Icurrent = i;
 			Stack->push_back(Icurrent);
 			connection = false;
@@ -285,6 +354,7 @@ int Graph::dft_Iterator::next() {
 		for (size_t i = 0; i < sizeV; i++)
 			if ((visited[i] == false) && (ItrG[backcur][i] == 1))
 			{
+				before = backcur;
 				Icurrent = i;
 				Stack->push_back(Icurrent);
 				connection = false;
@@ -296,6 +366,7 @@ int Graph::dft_Iterator::next() {
 		for (size_t i = 0; i < sizeV; i++)
 			if (visited[i] == false)
 			{
+				before = -1;
 				Icurrent = i;
 				Stack->push_back(Icurrent);
 				connection = true;
@@ -303,6 +374,10 @@ int Graph::dft_Iterator::next() {
 			}
 	}
 	return temp;
+}
+
+int  Graph::dft_Iterator::beforecur() {
+	return before;
 }
 
 bool  Graph::dft_Iterator::newconnection() {
@@ -350,6 +425,10 @@ int Graph::bft_Iterator::next() {
 			}
 	}
 	return temp;
+}
+
+int  Graph::bft_Iterator::beforecur() {
+	return before;
 }
 
 bool  Graph::bft_Iterator::newconnection() {
