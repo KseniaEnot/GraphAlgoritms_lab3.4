@@ -294,13 +294,131 @@ void Graph::PruferDecode(int* PrufC) {
 
 }
 
-void Graph::StrongConnected() {
-	/*
-	1.����������� ���� ��������� ���������������� �����.
-	2.��������� ����� � ������� �� ���� ��������� �����, ���������, � ����� ������� �������� �� ������.
-	3.��������� ����� � ������� �� �������� �����, � ��������� ��� ������� �� ��������� ������� �
-	������������ ������� � �������, ���������� � �.2.
-	4.���������� �� �.3 ������� � �������� ������ �������� ������������.*/
+dualList* Graph::StrongConnected() {
+	int* number = new int[V];
+	bool* visited = new bool[V];
+	dualList* Stack = new dualList();
+	bool canGo=true;
+	int Icurrent = 0, count = 0,temp;
+	Stack->push_back(Icurrent);
+	for (size_t i = 0; i < V; i++) {
+		number[i] = -1;
+		visited[i] = false;
+	}
+	while (canGo)
+	{
+		visited[Icurrent] = true;
+		temp = Icurrent;
+		for (size_t i = 0; i < V; i++)
+			if ((visited[i] == false) && (G[i][Icurrent] == 1))
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
+				break;
+			}
+		int backcur;
+		while ((temp == Icurrent) && !Stack->isEmpty())
+		{
+			backcur = Stack->at(Stack->get_size() - 1);
+			number[count] = backcur;
+			count++;
+			Stack->pop_back();
+			for (size_t i = 0; i < V; i++)
+				if ((visited[i] == false) && (G[i][backcur] == 1))
+				{
+					Icurrent = i;
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		if (temp == Icurrent)
+		{
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false)
+				{
+					Icurrent = i;
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		canGo = false;
+		if (!Stack->isEmpty())
+			canGo = true;
+		else {
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false) {
+					canGo = true;
+					break;
+				}
+		}
+	}
+	for (size_t i = 0; i < V; i++) {
+		visited[i] = false;
+	}
+	canGo = true;
+	int countSv = 0;
+	Icurrent = number[count];
+	Stack->clear();
+	number[V - 1] = -1;
+	Iterator* g_bft_iterator = create_bft_iterator(Icurrent);
+	dualList* Result = new dualList[V];
+	Result[countSv].push_back(Icurrent);
+	while (canGo)
+	{
+		visited[Icurrent] = true;
+		temp = Icurrent;
+		for (size_t i = 0; i < V; i++)
+			if ((visited[i] == false) && (G[i][Icurrent] == 1))
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
+				break;
+			}
+		int backcur;
+		while ((temp == Icurrent) && !Stack->isEmpty())
+		{
+			backcur = Stack->at(Stack->get_size() - 1);
+			Stack->pop_back();
+			for (size_t i = 0; i < V; i++)
+				if ((visited[i] == false) && (G[i][backcur] == 1))
+				{
+					Icurrent = i;
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		for (size_t i = 0; i < V; i++)
+			if (number[i]==Icurrent)
+			{
+				Result[countSv].push_back(Icurrent);
+				number[i] = -1;
+				break;
+			}
+		if (temp == Icurrent)
+		{
+			for (int i = V-1; i >= 0; i--)
+				if ((visited[i] == false)&&(number[i]!=-1))
+				{
+					countSv++;
+					Icurrent = i;
+					Result[countSv].push_back(Icurrent);
+					number[i] = -1;
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		canGo = false;
+		if (!Stack->isEmpty())
+			canGo = true;
+		else {
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false) {
+					canGo = true;
+					break;
+				}
+		}
+	}
+	return Result;
 }
 
 int* Graph::Dijkstra(int A, int B) {

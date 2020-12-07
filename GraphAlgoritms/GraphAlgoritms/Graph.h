@@ -25,7 +25,7 @@ public:
 	bool IfTree();
 	int* PruferCode();
 	void PruferDecode(int*);
-	void StrongConnected();
+	dualList* StrongConnected();
 	int* Dijkstra(int,int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
