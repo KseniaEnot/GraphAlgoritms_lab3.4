@@ -24,7 +24,7 @@ public:
 	bool IfBipartite();
 	bool IfTree();
 	int* PruferCode();
-	void PruferDecode(int*);
+	void PruferDecode(int*, int);
 	void StrongConnected();
 	int* Dijkstra(int,int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
