@@ -422,8 +422,41 @@ dualList* Graph::StrongConnected() {
 	return Result;
 }
 
-int* Graph::Dijkstra(int A, int B) {
-	return NULL;
+int Graph::GetSize() {
+	return V;
+}
+
+int* Graph::Dijkstra(int A) {  
+	int* distance = new int[V];
+	bool* visited = new bool[V];
+	for (size_t i = 0; i < V; i++) {
+		distance[i] = G[A][i];
+		visited[i] = false;
+	}
+	int u=0,index=0,min;
+	distance[A] = 0;
+	for (size_t i = 0; i < V; i++)
+	{
+		min = INT_MAX;
+		for (size_t j = 0; j < V; j++)
+		{
+			if ((visited[j]==false)&&(distance[j]<min))  //finding a shortcut
+			{
+				min = distance[j];
+				index = j;
+			}
+		}
+		u = index;
+		visited[u] = true;
+		for (size_t j = 0; j < V; j++)
+		{
+			if ((visited[i]==false)&&(G[u][j]!=INT_MAX)&&(distance[u]+G[u][j] < distance[j])) //if shorter bypass
+			{
+				distance[j] = distance[u] + G[u][j];
+			}
+		}
+	}
+	return distance;  //if distance[i] == INT_MAX, the way doesn't exist
 }
 
 Iterator* Graph::create_dft_iterator(int start = 0) {

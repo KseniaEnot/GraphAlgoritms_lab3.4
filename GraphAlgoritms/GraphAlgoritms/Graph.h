@@ -18,6 +18,7 @@ public:
 		initGraph();
 	};
 
+	int GetSize();
 	void initGraph(); 
 	bool IfEulerian();
 	bool IfBipartite();
@@ -25,7 +26,7 @@ public:
 	int* PruferCode();
 	void PruferDecode(int*);
 	dualList* StrongConnected();
-	int* Dijkstra(int,int);
+	int* Dijkstra(int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
 	Iterator* create_bft_iterator(int); // breadth-first traverse iterator
