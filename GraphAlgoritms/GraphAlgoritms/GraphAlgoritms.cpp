@@ -9,6 +9,14 @@ int main()
     cout << g;
     cout << "ok";
     std::cout << std::endl;
+    int* code = new int[3];
+    for (int i = 0; i < 3; i++) cin >> code[i];
+    //code = g.PruferCode();
+    g.PruferDecode(code, 3);
+    cout << g;
+    /*int cur;
+    Iterator* g_bft_iterator = g.create_bft_iterator(0);
+    while (g_bft_iterator->has_next())
     dualList* Sv = g.StrongConnected();
     int i = 0;
     while (!Sv[i].isEmpty())

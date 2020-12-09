@@ -263,8 +263,43 @@ int* Graph::PruferCode() {
 	return PrufC;
 }
 
-void Graph::PruferDecode(int* PrufC) {
+void Graph::PruferDecode(int* PrufC, int Pruf_length) {
+	for (int i = 0; i < Pruf_length; i++)
+		if (PrufC[i] >= Pruf_length + 2) throw std::invalid_argument("Invalid Prufer Code");
 
+	V = Pruf_length + 2;
+	int* ver_num = new int[V];
+	int** p = (int**)malloc(sizeof(int*) * V);
+	int pos = 0, pos_pruf = 0;
+	for (int i = 0; i < V; i++)
+	{
+		ver_num[i] = i;
+		p[i] = (int*)malloc(V * sizeof(int));
+		for (int j = 0; j < V; j++) p[i][j] = 0;
+	}
+	for (; pos_pruf < V - 2; pos_pruf++) {
+		for (int i = pos_pruf; i < V - 2; i++) {
+			if (ver_num[pos] == PrufC[i] || ver_num[pos] == -1) { i = pos_pruf -1; pos++; }
+		}
+		p[ver_num[pos]][PrufC[pos_pruf]] = 1;
+		p[PrufC[pos_pruf]][ver_num[pos]] = 1;
+		ver_num[pos] = -1;
+		pos = 0;
+	}
+
+	int row = -1, col = -1;
+	for (int i = 0; i < V; i++)
+		if (ver_num[i] != -1 && row == -1) row = ver_num[i];
+		else if (ver_num[i] != -1) { col = ver_num[i]; break; }
+	p[row][col] = 1; p[col][row] = 1;
+	G = (int**)realloc(G, sizeof(int*) * V);
+	G = p;
+	/*for (int i = 0; i < V; i++)
+	{
+		cout << endl;
+		for (int j = 0; j < V; j++)
+			cout << p[i][j] << " ";
+	}*/
 }
 
 dualList* Graph::StrongConnected() {
