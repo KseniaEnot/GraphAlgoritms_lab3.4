@@ -5,14 +5,14 @@
 int main()
 {
     std::cout << "Hello World!\n";
-    Graph g;
+    Graph g(2);
     cout << g;
     cout << "ok";
     std::cout << std::endl;
-    int* code = new int[3];
-    for (int i = 0; i < 3; i++) cin >> code[i];
+    //int* code = new int[3];
+    //for (int i = 0; i < 3; i++) cin >> code[i];
     //code = g.PruferCode();
-    g.PruferDecode(code, 3);
+    //g.PruferDecode(code, 3);
     cout << g;
     /*int cur;
     Iterator* g_bft_iterator = g.create_bft_iterator(0);
@@ -33,6 +33,6 @@ int main()
         std::cout << "next " << g_dft_iterator->next() << " ";
         cout << "has_next " << g_dft_iterator->has_next() << " ";
         cout << "connect " << g_dft_iterator->newconnection() << "\n";
-    }*/    
+    }*/
 
 }

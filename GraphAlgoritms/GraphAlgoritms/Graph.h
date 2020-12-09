@@ -14,12 +14,16 @@ private:
 	bool DirectedCheck();
 	bool IfCycle();
 	void QuickSort(int L, int R, int* arr);
+
 public:
-	Graph(int count = 0){
-		initGraph();
+	Graph(int** new_graph = NULL, int ver_num = 0){
+		G = new_graph;
+		V = ver_num;
+		Directed = DirectedCheck();
 	};
 
-	void initGraph(); 
+	Graph(int choice, string filename = "in.txt");
+
 	bool IfEulerian();
 	bool IfBipartite();
 	bool IfTree();

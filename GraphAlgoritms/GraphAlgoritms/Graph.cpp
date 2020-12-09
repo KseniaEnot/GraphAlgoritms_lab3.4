@@ -4,23 +4,32 @@
 #include <string>
 #include <fstream>
 
-void Graph::initGraph() {
-	int choice;
+Graph::Graph(int choice, string filename) {
+	//choice 1 -> reading from console
+	//choice 2-> reading from file
+
+	//int choice;
 	fstream f;
-	cout << "Hello, choose input method\n 1 - console\n2 - file\n";
-	cin >> choice;
+	std::cout << "Hello, choose input method\n 1 - console\n2 - file\n";
+	//cin >> choice;
+
 	//reading vertices
 	if (choice == 1) {
 		cout << "Number of vertices: ";
 		cin >> V;
 	}
 	else if (choice == 2) {
-		string filename;
-		cout << "Input file name: "; cin >> filename;
-		f.open(filename, ios::in); //trow error if not opened
+		//string filename = "in.txt";
+		//cout << "Input file name: "; cin >> filename;
+		f.open(filename, ios::in);
+		if (f.bad()) throw std::out_of_range("File cannot be opened");
 		f >> V;
 	}
-	else { cout << "Wrong input. Try again\n"; initGraph(); return; } //trow error
+	else { 
+		cout << "Wrong input. Try again\n"; 
+		throw std::invalid_argument("Invalid Option");
+		return; 
+	}
 
 	//memory
 	int** p;
@@ -45,7 +54,13 @@ void Graph::initGraph() {
 			{
 				int temp; cin >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
-				else { throw std::invalid_argument("Input error"); V = 0; } //+clean graph to 0??????????
+				else { 
+					throw std::invalid_argument("Input error");
+					for (int k = 0; k < i; k++)
+						free(G[k]);
+					free(G);
+					V = 0; 
+				}
 				if (i == j) G[i][j] = 0;
 			}
 		}
@@ -67,13 +82,20 @@ void Graph::initGraph() {
 				}
 				int temp; f >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
-				else { throw std::invalid_argument("Input error"); V = 0; } //+clean graph to 0????????????
+				else {
+					throw std::invalid_argument("Input error");
+					for (int k = 0; k < i; k++)
+						free(G[k]);
+					free(G);
+					V = 0;
+				}
 				if (i == j) G[i][j] = 0;
 			}
 		}
 		cout << "Sucessfully read." << V << endl;
 		f.close();
 	}
+	//checking if graph is directed
 	Directed = DirectedCheck();
 }
 
