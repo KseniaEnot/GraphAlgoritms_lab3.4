@@ -17,17 +17,26 @@ int main()
     /*int cur;
     Iterator* g_bft_iterator = g.create_bft_iterator(0);
     while (g_bft_iterator->has_next())
+    dualList* Sv = g.StrongConnected();
+    int i = 0;
+    while (!Sv[i].isEmpty())
     {
-        std::cout << "next " << g_bft_iterator->next() << " ";
-        cout << "has_next " << g_bft_iterator->has_next() << " ";
-        cout << "connect " << g_bft_iterator->newconnection() << "\n";
+        for (size_t j = 0; j < Sv[i].get_size(); j++)
+        {
+            cout << Sv[i].at(j) << " ";
+        }
+        cout << endl;
+        i++;
     }
-     std::cout << std::endl;
-    std::cout << g.IfBipartite() << std::endl;
-    std::cout << std::endl;
-    cout << "ok\n";
-    cout << endl << g.IfEulerian();
+
+
+    /*int i = 0;
     Iterator* g_dft_iterator = g.create_dft_iterator(0);
+    while (g_dft_iterator->has_next() != 0)
+    {
+        std::cout << i << " next: " << g_dft_iterator->next() << endl;
+        i++;
+    }
     while (g_dft_iterator->has_next() != 0)
     {
         std::cout << "next " << g_dft_iterator->next() << " ";
