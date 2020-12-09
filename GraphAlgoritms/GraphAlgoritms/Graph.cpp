@@ -99,37 +99,12 @@ Graph::Graph(int choice, string filename) {
 	Directed = DirectedCheck();
 }
 
-void Graph::QuickSort(int L, int R, int* arr)
-{
-	int x = arr[(R + L) / 2]; //choose the middle element as a pivot
-	int swapbuf;
-	int i = L, j = R;
-	do
-	{
-		while (arr[i] < x)//looking for an element smaller than the pivot
-			i++;
-		while (arr[j] > x)//looking for an element bigger than the pivot
-			j--;
-		if (i <= j) // swap
-		{
-			swapbuf = arr[i];
-			arr[i] = arr[j];
-			arr[j] = swapbuf;
-			i++;
-			j--;
-		}
-	} while (i < j);
-	if (i < R) //if they did not go beyond the bounds of the array
-		QuickSort(i, R, arr);
-	if (j > L)
-		QuickSort(L, j, arr);
-}
 
 bool Graph::DirectedCheck() {
 	for (size_t i = 0; i < V; i++)
 		for (size_t j = i; j < V; j++)
 			if (G[i][j] != G[j][i])
-				return true;
+				return true;  //symmetry check
 	return false;
 }
 
@@ -145,10 +120,9 @@ bool Graph::IfCycle() {
 			cur = g_dft_iterator->next();
 			visited[cur] = true;
 			for (size_t i = 0; i < V; i++)
-				if ((G[cur][i] == 1) && (visited[i] == true))
+				if ((G[cur][i] == 1) && (visited[i] == true)) //we can go to the already visited peak
 					return true;
 		}
-		return false;
 	}
 	else {
 		Iterator* g_dft_iterator = create_dft_iterator(0);
@@ -162,12 +136,11 @@ bool Graph::IfCycle() {
 			cur = g_dft_iterator->next();
 			visited[cur] = true;
 			for (size_t i = 0; i < V; i++)
-				if ((G[cur][i] == 1) && (visited[i] == true) && (i != bef))
+				if ((G[cur][i] == 1) && (visited[i] == true) && (i != bef)) //we can go to the already visited peak, but not to the previous one 
 					return true;
 		}
-		return false;
 	}
-	
+	return false;
 }
 
 bool Graph::IfEulerian() {
@@ -213,10 +186,10 @@ bool Graph::IfBipartite() {
 	int cur;
 	while (g_bft_iterator->has_next())
 	{
-		if (g_bft_iterator->newconnection())
+		if (g_bft_iterator->newconnection())  //if switched to another connected component
 		{
 			cur = g_bft_iterator->next();
-			color[cur] = 1;
+			color[cur] = 1;  //paint in black
 		}
 		else
 			cur = g_bft_iterator->next();
@@ -225,13 +198,13 @@ bool Graph::IfBipartite() {
 			{
 				switch (color[i])
 				{
-				case 2:
-					if (color[cur] == 1)
+				case 2:  //if painted gray
+					if (color[cur] == 1)  //paint in the opposite color
 						color[i] = 0;
 					else color[i] = 1;
 					break;
 				default:
-					if (color[i] == color[cur])
+					if (color[i] == color[cur])  //if the colors match
 					{
 						return false;
 					}
@@ -243,7 +216,7 @@ bool Graph::IfBipartite() {
 }
 
 bool Graph::IfTree() {
-	if (IfCycle()) return false;
+	if (IfCycle()) return false;  //no cycles
 	Iterator* g_dft_iterator = create_dft_iterator(0);
 	if (Directed)
 	{
@@ -254,14 +227,14 @@ bool Graph::IfTree() {
 			countDeg = 0;
 			for (size_t j = 0; j < V; j++)
 				countDeg += G[j][i];
-			if (countDeg>1)
+			if (countDeg>1)  //entry degree greater than 1
 			{
 				return false;
 			}
 			else if (countDeg==0)
 			{
 				count++;
-				if (count > 1)
+				if (count > 1)  //entry degree 0 only at one vertex
 					return false;
 			}
 		}
@@ -270,7 +243,7 @@ bool Graph::IfTree() {
 		while (g_dft_iterator->has_next())
 		{
 			g_dft_iterator->next();
-			if (g_dft_iterator->newconnection()) return false;
+			if (g_dft_iterator->newconnection()) return false;  //one component of connectivity
 		}
 	}
 	return true;
@@ -351,17 +324,196 @@ void Graph::PruferDecode(int* PrufC, int Pruf_length) {
 	}*/
 }
 
-void Graph::StrongConnected() {
-	/*
-	1.����������� ���� ��������� ���������������� �����.
-	2.��������� ����� � ������� �� ���� ��������� �����, ���������, � ����� ������� �������� �� ������.
-	3.��������� ����� � ������� �� �������� �����, � ��������� ��� ������� �� ��������� ������� �
-	������������ ������� � �������, ���������� � �.2.
-	4.���������� �� �.3 ������� � �������� ������ �������� ������������.*/
+dualList* Graph::StrongConnected() {
+	int* number = new int[V];
+	bool* visited = new bool[V];
+	dualList* Stack = new dualList();
+	int backcur;
+	bool canGo=true;
+	int Icurrent = 0, count = 0,temp;
+	Stack->push_back(Icurrent);
+	for (size_t i = 0; i < V; i++) {
+		number[i] = -1;
+		visited[i] = false;
+	}
+	cout << endl;
+	while (canGo)  //depth-first traversal in a transposed graph
+	{
+		visited[Icurrent] = true;
+		temp = Icurrent;
+		for (size_t i = 0; i < V; i++)
+			if ((visited[i] == false) && (G[i][Icurrent] == 1))
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
+				break;
+			}
+		if (count > 0) {  //number the vertices upon exit
+			if ((temp == Icurrent) && (number[count - 1] != Icurrent))
+			{
+				number[count] = Icurrent;
+				count++;
+			}
+		}
+		else {
+			if (temp == Icurrent)
+			{
+				number[count] = Icurrent;
+				count++;
+			}
+		}
+		while ((temp == Icurrent) && !Stack->isEmpty())
+		{
+			backcur = Stack->at(Stack->get_size() - 1);
+			Stack->pop_back();
+			for (size_t i = 0; i < V; i++)
+				if ((visited[i] == false) && (G[i][backcur] == 1))
+				{
+					Icurrent = i;
+					Stack->push_back(backcur);
+					Stack->push_back(Icurrent);
+					break;
+				}
+			if (count > 0) {  //number the vertices upon exit
+				if ((temp == Icurrent) && (number[count - 1] != backcur))
+				{
+					number[count] = backcur;
+					count++;
+				}
+			}else{
+				if (temp == Icurrent)
+				{
+					number[count] = backcur;
+					count++;
+				}
+			}
+				
+		}
+		if (temp == Icurrent)
+		{
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false)
+				{
+					Icurrent = i;
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		canGo = false;
+		if (!Stack->isEmpty())
+			canGo = true;
+		else {
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false) {
+					canGo = true;
+					break;
+				}
+		}
+	}
+	for (size_t i = 0; i < V; i++) {
+		visited[i] = false;
+	}
+	canGo = true;
+	int countSv = 0;
+	Icurrent = number[count-1];  //starting with the last one on the way out
+	Stack->clear();
+	dualList* Result = new dualList[V];
+	Stack->push_back(Icurrent);
+	while (canGo)  //number the vertices upon exit
+	{
+		visited[Icurrent] = true;
+		for (size_t i = 0; i < V; i++)
+			if (number[i] == Icurrent)
+			{
+				Result[countSv].push_back(Icurrent);  //add to list
+				number[i] = -1;
+				break;
+			}
+		temp = Icurrent;
+		for (size_t i = 0; i < V; i++)
+			if ((visited[i] == false) && (G[Icurrent][i] == 1))
+			{
+				Icurrent = i;
+				Stack->push_back(Icurrent);
+				break;
+			}
+		int backcur;
+		while ((temp == Icurrent) && !Stack->isEmpty())
+		{
+			backcur = Stack->at(Stack->get_size() - 1);
+			Stack->pop_back();
+			for (size_t i = 0; i < V; i++)
+				if ((visited[i] == false) && (G[backcur][i] == 1))
+				{
+					Icurrent = i;
+					Stack->push_back(backcur);
+					Stack->push_back(Icurrent);
+					break;
+				}
+		}
+		if (temp == Icurrent)
+		{
+			for (int i = V-1; i >= 0; i--)
+				if (number[i] != -1)  //we go to the next not visited from the last one on the way out
+				{
+					if (visited[number[i]] == false)
+					{
+						countSv++;  //came out of the tree
+						Icurrent = number[i];
+						Stack->push_back(Icurrent);
+						break;
+					}
+				}
+		}
+		canGo = false;
+		if (!Stack->isEmpty())
+			canGo = true;
+		else {
+			for (size_t i = 0; i < V; i++)
+				if (visited[i] == false) {
+					canGo = true;
+					break;
+				}
+		}
+	}
+	return Result;
 }
 
-int* Graph::Dijkstra(int A, int B) {
-	return NULL;
+int Graph::GetSize() {
+	return V;
+}
+
+int* Graph::Dijkstra(int A) {  
+	int* distance = new int[V];
+	bool* visited = new bool[V];
+	for (size_t i = 0; i < V; i++) {
+		distance[i] = G[A][i];
+		visited[i] = false;
+	}
+	int u=0,index=0,min;
+	distance[A] = 0;
+	for (size_t i = 0; i < V; i++)
+	{
+		min = INT_MAX;
+		for (size_t j = 0; j < V; j++)
+		{
+			if ((visited[j]==false)&&(distance[j]<min))  //finding a shortcut
+			{
+				min = distance[j];
+				index = j;
+			}
+		}
+		u = index;
+		visited[u] = true;
+		for (size_t j = 0; j < V; j++)
+		{
+			if ((visited[i]==false)&&(G[u][j]!=INT_MAX)&&(distance[u]+G[u][j] < distance[j])) //if shorter bypass
+			{
+				distance[j] = distance[u] + G[u][j];
+			}
+		}
+	}
+	return distance;  //if distance[i] == INT_MAX, the way doesn't exist
 }
 
 Iterator* Graph::create_dft_iterator(int start = 0) {
@@ -395,7 +547,7 @@ int Graph::dft_Iterator::next() {
 	visited[Icurrent] = true;
 	int temp = Icurrent;
 	for (size_t i = 0; i < sizeV; i++)
-		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1))
+		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1))  //go deeper
 		{
 			before = Icurrent;
 			Icurrent = i;
@@ -406,13 +558,14 @@ int Graph::dft_Iterator::next() {
 	int backcur;
 	while ((temp == Icurrent) && !Stack->isEmpty())
 	{
-		backcur = Stack->at(Stack->get_size() - 1);
+		backcur = Stack->at(Stack->get_size() - 1);  //pop the top off the stack
 		Stack->pop_back();
 		for (size_t i = 0; i < sizeV; i++)
-			if ((visited[i] == false) && (ItrG[backcur][i] == 1))
+			if ((visited[i] == false) && (ItrG[backcur][i] == 1))  //go deeper
 			{
 				before = backcur;
 				Icurrent = i;
+				Stack->push_back(backcur);
 				Stack->push_back(Icurrent);
 				connection = false;
 				break;
@@ -421,7 +574,7 @@ int Graph::dft_Iterator::next() {
 	if (temp == Icurrent)
 	{
 		for (size_t i = 0; i < sizeV; i++)
-			if (visited[i] == false)
+			if (visited[i] == false)  //go to the next component of connectivity
 			{
 				before = -1;
 				Icurrent = i;
@@ -461,19 +614,19 @@ int Graph::bft_Iterator::next() {
 	visited[Icurrent] = true;
 	int temp = Icurrent;
 	for (size_t i = 0; i < sizeV; i++)
-		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {
+		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {  //put all unvisited neighboring vertices in the queue
 			Queue->push_back(i);
 		}
-	while (!Queue->isEmpty() && (visited[Icurrent] == true))
+	while (!Queue->isEmpty())  //deleted " && (visited[Icurrent] == true)"
 	{
-		Icurrent = Queue->at(0);
+		Icurrent = Queue->at(0);  //getting the top out of the queue
 		connection = false;
 		Queue->pop_front();
 	}
 	if (Queue->isEmpty() && (visited[Icurrent] == true))
 	{
 		for (size_t i = 0; i < sizeV; i++)
-			if (visited[i] == false)
+			if (visited[i] == false)  //go to the next component of connectivity
 			{
 				Icurrent = i;
 				Queue->push_back(Icurrent);
