@@ -16,8 +16,6 @@ Graph::Graph(int choice, string filename) {
 		cin >> V;
 	}
 	else if (choice == 2) {
-		//string filename = "in.txt";
-		//cout << "Input file name: "; cin >> filename;
 		f.open(filename, ios::in);
 		f >> V;
 		if (f.eof() || V == 0) throw std::out_of_range("Graph is empty");
@@ -64,7 +62,6 @@ Graph::Graph(int choice, string filename) {
 		cout << "Sucessfully read.\n";
 	}
 	else if (choice == 2) {
-		//f >> noskipws;
 		//we believe that people can write input properly i guess
 		for (int i = 0; i < V; i++)
 		{
@@ -75,7 +72,7 @@ Graph::Graph(int choice, string filename) {
 			for (int j = 0; j < V; j++)
 			{
 				if (f.eof()) {
-					throw std::invalid_argument("End of file"); //+clean graph to 0
+					throw std::invalid_argument("End of file"); 
 				}
 				int temp; f >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
@@ -95,7 +92,6 @@ Graph::Graph(int choice, string filename) {
 	//checking if graph is directed
 	Directed = DirectedCheck();
 }
-
 
 bool Graph::DirectedCheck() {
 	for (size_t i = 0; i < V; i++)
@@ -238,10 +234,12 @@ bool Graph::IfTree() {
 }
 
 int* Graph::PruferCode() {
+	//code only for not directed trees
 	if (!IfTree() || Directed) throw std::invalid_argument("Invalid Graph Type");
 	if (V <= 2) return NULL;
 	int* PrufC = new int[V - 2]; 
 	int** G_copy = new int*[V];
+	//copy the array to work with
 	for (int i = 0; i < V; i++)
 	{
 		G_copy[i] = new int[V];
@@ -252,7 +250,7 @@ int* Graph::PruferCode() {
 	int cur_ver = 0, connect_num = 0, next_ver = 0, cur_Pruf = 0;
 	bool exit = false;
 	while (cur_Pruf < V - 2) {
-		for (int j = 0; j < V; j++) {
+		for (int j = 0; j < V; j++) { //searching for the smallest 'leaf' with 1 connection
 			if (G_copy[cur_ver][j] == 1) {
 				connect_num++;
 				if (connect_num > 1) { cur_ver++; exit = true; break; }
@@ -260,17 +258,10 @@ int* Graph::PruferCode() {
 			}
 		}
 		if (connect_num == 0) { exit = true; cur_ver++; }
-		if (!exit) {
+		if (!exit) { //found the leaf, deleting it and adding number to prufer code
 				G_copy[next_ver][cur_ver] = 0;
 				G_copy[cur_ver][next_ver] = 0;
 				PrufC[cur_Pruf] = next_ver;
-				/*cout << next_ver << " GGGGG\n";
-				for (int i = 0; i < V; i++) {
-					for (int j = 0; j < V; j++) {
-						cout << G_copy[i][j] << " ";
-					}
-					cout << endl;
-				}*/
 				if (next_ver < cur_ver) cur_ver = next_ver;
 				else cur_ver++;
 				cur_Pruf++;
@@ -288,13 +279,16 @@ void Graph::PruferDecode(int* PrufC, int Pruf_length) {
 	int* ver_num = new int[V];
 	int** p = (int**)malloc(sizeof(int*) * V);
 	int pos = 0, pos_pruf = 0;
+	//two arrays; prufer code and vertices in order
 	for (int i = 0; i < V; i++)
 	{
 		ver_num[i] = i;
 		p[i] = (int*)malloc(V * sizeof(int));
 		for (int j = 0; j < V; j++) p[i][j] = 0;
 	}
-	for (; pos_pruf < V - 2; pos_pruf++) {
+	for (; pos_pruf < V - 2; pos_pruf++) { 
+		//connecting a vertex from prufer with smallest vertex from other array
+		//second vertex shouldn't be in prufer code
 		for (int i = pos_pruf; i < V - 2; i++) {
 			if (ver_num[pos] == PrufC[i] || ver_num[pos] == -1) { i = pos_pruf -1; pos++; }
 		}
@@ -311,12 +305,6 @@ void Graph::PruferDecode(int* PrufC, int Pruf_length) {
 	p[row][col] = 1; p[col][row] = 1;
 	G = (int**)realloc(G, sizeof(int*) * V);
 	G = p;
-	/*for (int i = 0; i < V; i++)
-	{
-		cout << endl;
-		for (int j = 0; j < V; j++)
-			cout << p[i][j] << " ";
-	}*/
 }
 
 dualList* Graph::StrongConnected() {
