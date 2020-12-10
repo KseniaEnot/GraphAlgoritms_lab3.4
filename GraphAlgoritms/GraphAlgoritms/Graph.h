@@ -12,8 +12,7 @@ private:
 	int V;
 	bool Directed;
 	bool DirectedCheck();
-	bool IfCycle();
-	void QuickSort(int L, int R, int* arr);
+	bool IfCycleNoDir();
 
 public:
 	Graph(int** new_graph = NULL, int ver_num = 0){
@@ -24,13 +23,14 @@ public:
 
 	Graph(int choice, string filename = "in.txt");
 
+	int GetSize();
 	bool IfEulerian();
 	bool IfBipartite();
 	bool IfTree();
 	int* PruferCode();
 	void PruferDecode(int*, int);
-	void StrongConnected();
-	int* Dijkstra(int,int);
+	dualList* StrongConnected();
+	int* Dijkstra(int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
 	Iterator* create_bft_iterator(int); // breadth-first traverse iterator
