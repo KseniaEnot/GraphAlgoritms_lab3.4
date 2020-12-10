@@ -12,7 +12,7 @@ private:
 	int V;
 	bool Directed;
 	bool DirectedCheck();
-	bool IfCycle();
+	bool IfCycleNoDir();
 
 public:
 	Graph(int** new_graph = NULL, int ver_num = 0) {

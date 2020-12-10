@@ -7,8 +7,7 @@
 Graph::Graph(int choice, string filename) {
 	//choice 1 -> reading from console
 	//choice 2-> reading from file
-
-	//int choice;
+	
 	fstream f;
 
 	//reading vertices
@@ -106,21 +105,9 @@ bool Graph::DirectedCheck() {
 	return false;
 }
 
-bool Graph::IfCycle() {
+bool Graph::IfCycleNoDir() {
 	if (Directed) {
-		Iterator* g_dft_iterator = create_dft_iterator(0);
-		bool* visited = new bool[V];
-		for (size_t i = 0; i < V; i++)
-			visited[i] = false;
-		int cur;
-		while (g_dft_iterator->has_next())
-		{
-			cur = g_dft_iterator->next();
-			visited[cur] = true;
-			for (size_t i = 0; i < V; i++)
-				if ((G[cur][i] == 1) && (visited[i] == true)) //we can go to the already visited peak
-					return true;
-		}
+		throw std::invalid_argument("Invalid Graph Type");
 	}
 	else {
 		Iterator* g_dft_iterator = create_dft_iterator(0);
@@ -147,7 +134,7 @@ bool Graph::IfEulerian() {
 	int max_connect = 0, cur_connect = 0;
 	while (g_dft_iterator->has_next())
 	{
-		std::cout << g_dft_iterator->next() << " ";
+		g_dft_iterator->next();
 		if (!g_dft_iterator->newconnection()) cur_connect++;
 		else {
 			if (max_connect > 1) { if (cur_connect > 1) return false; }
@@ -155,7 +142,6 @@ bool Graph::IfEulerian() {
 			cur_connect = 0;
 		}
 	}
-	cout << cur_connect << " " << max_connect << endl;
 	if (cur_connect > 1 && max_connect > 1) return false;
 
 	//count
@@ -214,7 +200,6 @@ bool Graph::IfBipartite() {
 }
 
 bool Graph::IfTree() {
-	if (IfCycle()) return false;  //no cycles
 	Iterator* g_dft_iterator = create_dft_iterator(0);
 	if (Directed)
 	{
@@ -236,8 +221,13 @@ bool Graph::IfTree() {
 					return false;
 			}
 		}
+		if (count==0)  //no root
+		{
+			return false;
+		}
 	}
 	else {
+		if (IfCycleNoDir()) return false;  //no cycles
 		while (g_dft_iterator->has_next())
 		{
 			g_dft_iterator->next();
@@ -269,11 +259,18 @@ int* Graph::PruferCode() {
 				next_ver = j;
 			}
 		}
+		if (connect_num == 0) { exit = true; cur_ver++; }
 		if (!exit) {
 				G_copy[next_ver][cur_ver] = 0;
 				G_copy[cur_ver][next_ver] = 0;
 				PrufC[cur_Pruf] = next_ver;
-				cout << next_ver << " ";
+				/*cout << next_ver << " GGGGG\n";
+				for (int i = 0; i < V; i++) {
+					for (int j = 0; j < V; j++) {
+						cout << G_copy[i][j] << " ";
+					}
+					cout << endl;
+				}*/
 				if (next_ver < cur_ver) cur_ver = next_ver;
 				else cur_ver++;
 				cur_Pruf++;
@@ -413,6 +410,7 @@ dualList* Graph::StrongConnected() {
 	}
 	canGo = true;
 	int countSv = 0;
+
 	Icurrent = number[count-1];  //starting with the last one on the way out
 	Stack->clear();
 	dualList* Result = new dualList[V];
@@ -435,7 +433,6 @@ dualList* Graph::StrongConnected() {
 				Stack->push_back(Icurrent);
 				break;
 			}
-		int backcur;
 		while ((temp == Icurrent) && !Stack->isEmpty())
 		{
 			backcur = Stack->at(Stack->get_size() - 1);
@@ -636,7 +633,7 @@ int Graph::bft_Iterator::next() {
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {  //put all unvisited neighboring vertices in the queue
 			Queue->push_back(i);
 		}
-	while (!Queue->isEmpty() && (visited[Icurrent] == true))  //deleted " && (visited[Icurrent] == true)"
+	while (!Queue->isEmpty() && (visited[Icurrent] == true))
 	{
 		Icurrent = Queue->at(0);  //getting the top out of the queue
 		connection = false;
