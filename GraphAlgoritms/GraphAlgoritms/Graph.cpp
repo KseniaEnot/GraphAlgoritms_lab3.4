@@ -10,8 +10,6 @@ Graph::Graph(int choice, string filename) {
 
 	//int choice;
 	fstream f;
-	std::cout << "Hello, choose input method\n 1 - console\n2 - file\n";
-	//cin >> choice;
 
 	//reading vertices
 	if (choice == 1) {
@@ -22,8 +20,8 @@ Graph::Graph(int choice, string filename) {
 		//string filename = "in.txt";
 		//cout << "Input file name: "; cin >> filename;
 		f.open(filename, ios::in);
-		if (f.bad()) throw std::out_of_range("File cannot be opened");
 		f >> V;
+		if (f.eof() || V == 0) throw std::out_of_range("Graph is empty");
 	}
 	else { 
 		cout << "Wrong input. Try again\n"; 
@@ -486,8 +484,23 @@ int Graph::GetSize() {
 int* Graph::Dijkstra(int A) {  
 	int* distance = new int[V];
 	bool* visited = new bool[V];
+	
+	int** G_copy = new int* [V];
+	for (int i = 0; i < V; i++)
+	{
+		G_copy[i] = new int[V];
+		for (int j = 0; j < V; j++)
+			if (G[i][j] == 0)
+			{
+				G_copy[i][j] = INT_MAX;
+			}
+			else {
+				G_copy[i][j] = G[i][j];
+			}
+	}
+
 	for (size_t i = 0; i < V; i++) {
-		distance[i] = G[A][i];
+		distance[i] = G_copy[A][i];
 		visited[i] = false;
 	}
 	int u=0,index=0,min;
@@ -507,12 +520,18 @@ int* Graph::Dijkstra(int A) {
 		visited[u] = true;
 		for (size_t j = 0; j < V; j++)
 		{
-			if ((visited[i]==false)&&(G[u][j]!=INT_MAX)&&(distance[u]+G[u][j] < distance[j])) //if shorter bypass
+			if ((visited[j]==false)&&(G_copy[u][j]!=INT_MAX) && (distance[u] != INT_MAX) &&((distance[u]+G_copy[u][j]) < distance[j])) //if shorter bypass
 			{
-				distance[j] = distance[u] + G[u][j];
+				distance[j] = distance[u] + G_copy[u][j];
 			}
 		}
 	}
+
+	for (size_t i = 0; i < V; i++)
+	{
+		delete G_copy[i];
+	}
+	delete G_copy;
 	return distance;  //if distance[i] == INT_MAX, the way doesn't exist
 }
 
@@ -617,7 +636,7 @@ int Graph::bft_Iterator::next() {
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {  //put all unvisited neighboring vertices in the queue
 			Queue->push_back(i);
 		}
-	while (!Queue->isEmpty())  //deleted " && (visited[Icurrent] == true)"
+	while (!Queue->isEmpty() && (visited[Icurrent] == true))  //deleted " && (visited[Icurrent] == true)"
 	{
 		Icurrent = Queue->at(0);  //getting the top out of the queue
 		connection = false;
