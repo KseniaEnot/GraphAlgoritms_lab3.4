@@ -15,7 +15,7 @@ private:
 	bool IfCycleNoDir();
 
 public:
-	Graph(int** new_graph = NULL, int ver_num = 0){
+	Graph(int** new_graph = NULL, int ver_num = 0) {
 		G = new_graph;
 		V = ver_num;
 		Directed = DirectedCheck();
@@ -98,7 +98,7 @@ public:
 		int beforecur(); //???
 		~bft_Iterator() {
 			delete visited;
-			delete* ItrG; 
+			delete* ItrG;
 		}
 	};
 
