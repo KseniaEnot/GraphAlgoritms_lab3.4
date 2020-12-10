@@ -32,6 +32,12 @@ public:
 	dualList* StrongConnected();
 	int* Dijkstra(int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
+	friend bool operator == (Graph& left, int right[]) {
+		for (int i = 0; i < left.V; i++)
+			for (int j = 0; j < left.V; j++)
+				if (left.G[i][j] != right[i * left.V + j]) return false;
+		return true;
+	}
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
 	Iterator* create_bft_iterator(int); // breadth-first traverse iterator
 
@@ -95,7 +101,7 @@ public:
 		int next();
 		bool has_next();
 		bool newconnection();
-		int beforecur(); //???
+		int beforecur();
 		~bft_Iterator() {
 			delete visited;
 			delete* ItrG;
