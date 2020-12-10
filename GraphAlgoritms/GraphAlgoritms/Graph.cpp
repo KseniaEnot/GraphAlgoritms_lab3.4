@@ -16,8 +16,6 @@ Graph::Graph(int choice, string filename) {
 		cin >> V;
 	}
 	else if (choice == 2) {
-		//string filename = "in.txt";
-		//cout << "Input file name: "; cin >> filename;
 		f.open(filename, ios::in);
 		f >> V;
 		if (f.eof() || V == 0) throw std::out_of_range("Graph is empty");
@@ -64,7 +62,6 @@ Graph::Graph(int choice, string filename) {
 		cout << "Sucessfully read.\n";
 	}
 	else if (choice == 2) {
-		//f >> noskipws;
 		//we believe that people can write input properly i guess
 		for (int i = 0; i < V; i++)
 		{
@@ -75,7 +72,7 @@ Graph::Graph(int choice, string filename) {
 			for (int j = 0; j < V; j++)
 			{
 				if (f.eof()) {
-					throw std::invalid_argument("End of file"); //+clean graph to 0
+					throw std::invalid_argument("End of file"); 
 				}
 				int temp; f >> temp;
 				if (temp == 0 || temp == 1) G[i][j] = temp;
@@ -103,8 +100,6 @@ bool Graph::DirectedCheck() {
 				return true;  //symmetry check
 	return false;
 }
-
-
 
 bool Graph::IfCycleNoDir() {
 	if (Directed) {
