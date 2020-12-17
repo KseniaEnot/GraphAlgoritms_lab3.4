@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphAlgoritms", "GraphAlgoritms\GraphAlgoritms.vcxproj", "{A44FCA07-B32B-4BD6-8803-F09F6308FDD9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphAlgoritms_test", "GraphAlgoritms_test\GraphAlgoritms_test.vcxproj", "{108F2444-92EB-489B-B2D0-4861B0F2332C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{A44FCA07-B32B-4BD6-8803-F09F6308FDD9}.Release|x64.Build.0 = Release|x64
 		{A44FCA07-B32B-4BD6-8803-F09F6308FDD9}.Release|x86.ActiveCfg = Release|Win32
 		{A44FCA07-B32B-4BD6-8803-F09F6308FDD9}.Release|x86.Build.0 = Release|Win32
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Debug|x64.ActiveCfg = Debug|x64
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Debug|x64.Build.0 = Debug|x64
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Debug|x86.ActiveCfg = Debug|Win32
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Debug|x86.Build.0 = Debug|Win32
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Release|x64.ActiveCfg = Release|x64
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Release|x64.Build.0 = Release|x64
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Release|x86.ActiveCfg = Release|Win32
+		{108F2444-92EB-489B-B2D0-4861B0F2332C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
