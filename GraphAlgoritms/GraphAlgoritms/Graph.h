@@ -1,6 +1,8 @@
 #pragma once
 #include "Iterator.h";
 #include "dualList.h"
+#include "Stack.h"
+#include "Queue.h"
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -46,19 +48,19 @@ public:
 	private:
 		bool* visited;
 		int** ItrG;
-		dualList* Stack;
+		Stack* stack;
 		int Icurrent;
 		int sizeV;
 		int before;
 		bool connection;
 	public:
 		dft_Iterator(int** Gr, int max, int start = 0) {
-			Stack = new dualList();
+			stack = new Stack();
 			sizeV = max;
 			ItrG = Gr;
 			Icurrent = start;
 			visited = new bool[max];
-			Stack->push_back(Icurrent);
+			stack->push(Icurrent);
 			for (size_t i = 0; i < max; i++)
 				visited[i] = false;
 			visited[Icurrent] = true;
@@ -80,19 +82,19 @@ public:
 	private:
 		bool* visited;
 		int** ItrG;
-		dualList* Queue;
+		Queue* queue;
 		int Icurrent;
 		int sizeV;
 		int before = -1;
 		bool connection;
 	public:
 		bft_Iterator(int** Gr, int max, int start = 0) {
-			Queue = new dualList();
+			queue = new Queue();
 			sizeV = max;
 			ItrG = Gr;
 			Icurrent = start;
 			visited = new bool[max];
-			Queue->push_back(Icurrent);
+			queue->push(Icurrent);
 			for (size_t i = 0; i < max; i++)
 				visited[i] = false;
 			visited[Icurrent] = true;

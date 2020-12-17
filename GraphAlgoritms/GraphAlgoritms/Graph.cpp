@@ -310,11 +310,11 @@ void Graph::PruferDecode(int* PrufC, int Pruf_length) {
 dualList* Graph::StrongConnected() {
 	int* number = new int[V];
 	bool* visited = new bool[V];
-	dualList* Stack = new dualList();
+	Stack* stack = new Stack();
 	int backcur;
 	bool canGo=true;
 	int Icurrent = 0, count = 0,temp;
-	Stack->push_back(Icurrent);
+	stack->push(Icurrent);
 	for (size_t i = 0; i < V; i++) {
 		number[i] = -1;
 		visited[i] = false;
@@ -328,7 +328,7 @@ dualList* Graph::StrongConnected() {
 			if ((visited[i] == false) && (G[i][Icurrent] == 1))
 			{
 				Icurrent = i;
-				Stack->push_back(Icurrent);
+				stack->push(Icurrent);
 				break;
 			}
 		if (count > 0) {  //number the vertices upon exit
@@ -345,16 +345,15 @@ dualList* Graph::StrongConnected() {
 				count++;
 			}
 		}
-		while ((temp == Icurrent) && !Stack->isEmpty())
+		while ((temp == Icurrent) && !stack->isEmpty())
 		{
-			backcur = Stack->at(Stack->get_size() - 1);
-			Stack->pop_back();
+			backcur = stack->pop();
 			for (size_t i = 0; i < V; i++)
 				if ((visited[i] == false) && (G[i][backcur] == 1))
 				{
 					Icurrent = i;
-					Stack->push_back(backcur);
-					Stack->push_back(Icurrent);
+					stack->push(backcur);
+					stack->push(Icurrent);
 					break;
 				}
 			if (count > 0) {  //number the vertices upon exit
@@ -378,12 +377,12 @@ dualList* Graph::StrongConnected() {
 				if (visited[i] == false)
 				{
 					Icurrent = i;
-					Stack->push_back(Icurrent);
+					stack->push(Icurrent);
 					break;
 				}
 		}
 		canGo = false;
-		if (!Stack->isEmpty())
+		if (!stack->isEmpty())
 			canGo = true;
 		else {
 			for (size_t i = 0; i < V; i++)
@@ -400,9 +399,9 @@ dualList* Graph::StrongConnected() {
 	int countSv = 0;
 
 	Icurrent = number[count-1];  //starting with the last one on the way out
-	Stack->clear();
+	stack->clear();
 	dualList* Result = new dualList[V];
-	Stack->push_back(Icurrent);
+	stack->push(Icurrent);
 	while (canGo)  //number the vertices upon exit
 	{
 		visited[Icurrent] = true;
@@ -418,19 +417,18 @@ dualList* Graph::StrongConnected() {
 			if ((visited[i] == false) && (G[Icurrent][i] == 1))
 			{
 				Icurrent = i;
-				Stack->push_back(Icurrent);
+				stack->push(Icurrent);
 				break;
 			}
-		while ((temp == Icurrent) && !Stack->isEmpty())
+		while ((temp == Icurrent) && !stack->isEmpty())
 		{
-			backcur = Stack->at(Stack->get_size() - 1);
-			Stack->pop_back();
+			backcur = stack->pop();
 			for (size_t i = 0; i < V; i++)
 				if ((visited[i] == false) && (G[backcur][i] == 1))
 				{
 					Icurrent = i;
-					Stack->push_back(backcur);
-					Stack->push_back(Icurrent);
+					stack->push(backcur);
+					stack->push(Icurrent);
 					break;
 				}
 		}
@@ -443,13 +441,13 @@ dualList* Graph::StrongConnected() {
 					{
 						countSv++;  //came out of the tree
 						Icurrent = number[i];
-						Stack->push_back(Icurrent);
+						stack->push(Icurrent);
 						break;
 					}
 				}
 		}
 		canGo = false;
-		if (!Stack->isEmpty())
+		if (!stack->isEmpty())
 			canGo = true;
 		else {
 			for (size_t i = 0; i < V; i++)
@@ -536,7 +534,7 @@ std::ostream& operator << (std::ostream& out, const Graph& Gr) {
 }
 
 bool Graph::dft_Iterator::has_next() {
-	if (!Stack->isEmpty())
+	if (!stack->isEmpty())
 		return true;
 	for (size_t i = 0; i < sizeV; i++)
 		if (visited[i] == false)
@@ -555,22 +553,21 @@ int Graph::dft_Iterator::next() {
 		{
 			before = Icurrent;
 			Icurrent = i;
-			Stack->push_back(Icurrent);
+			stack->push(Icurrent);
 			connection = false;
 			break;
 		}
 	int backcur;
-	while ((temp == Icurrent) && !Stack->isEmpty())
+	while ((temp == Icurrent) && !stack->isEmpty())
 	{
-		backcur = Stack->at(Stack->get_size() - 1);  //pop the top off the stack
-		Stack->pop_back();
+		backcur = stack->pop();  //pop the top off the stack
 		for (size_t i = 0; i < sizeV; i++)
 			if ((visited[i] == false) && (ItrG[backcur][i] == 1))  //go deeper
 			{
 				before = backcur;
 				Icurrent = i;
-				Stack->push_back(backcur);
-				Stack->push_back(Icurrent);
+				stack->push(backcur);
+				stack->push(Icurrent);
 				connection = false;
 				break;
 			}
@@ -582,7 +579,7 @@ int Graph::dft_Iterator::next() {
 			{
 				before = -1;
 				Icurrent = i;
-				Stack->push_back(Icurrent);
+				stack->push(Icurrent);
 				connection = true;
 				break;
 			}
@@ -603,7 +600,7 @@ Iterator* Graph::create_bft_iterator(int start = 0) {
 }
 
 bool Graph::bft_Iterator::has_next() {
-	if (!Queue->isEmpty())
+	if (!queue->isEmpty())
 		return true;
 	for (size_t i = 0; i < sizeV; i++)
 		if (visited[i] == false)
@@ -619,21 +616,20 @@ int Graph::bft_Iterator::next() {
 	int temp = Icurrent;
 	for (size_t i = 0; i < sizeV; i++)
 		if ((visited[i] == false) && (ItrG[Icurrent][i] == 1)) {  //put all unvisited neighboring vertices in the queue
-			Queue->push_back(i);
+			queue->push(i);
 		}
-	while (!Queue->isEmpty() && (visited[Icurrent] == true))
+	while (!queue->isEmpty() && (visited[Icurrent] == true))
 	{
-		Icurrent = Queue->at(0);  //getting the top out of the queue
+		Icurrent = queue->pop();  //getting the top out of the queue
 		connection = false;
-		Queue->pop_front();
 	}
-	if (Queue->isEmpty() && (visited[Icurrent] == true))
+	if (queue->isEmpty() && (visited[Icurrent] == true))
 	{
 		for (size_t i = 0; i < sizeV; i++)
 			if (visited[i] == false)  //go to the next component of connectivity
 			{
 				Icurrent = i;
-				Queue->push_back(Icurrent);
+				queue->push(Icurrent);
 				connection = true;
 				break;
 			}
