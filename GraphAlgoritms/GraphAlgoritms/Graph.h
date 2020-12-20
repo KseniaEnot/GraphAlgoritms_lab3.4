@@ -10,20 +10,20 @@ using namespace std;
 class Graph
 {
 private:
-	int** G;
-	int V;
+	int** Graph_Matrix;
+	int Vertices;
 	bool Directed;
 	bool DirectedCheck();
 	bool IfCycleNoDir();
 
 public:
 	Graph(int** new_graph = NULL, int ver_num = 0) {
-		G = new_graph;
-		V = ver_num;
+		Graph_Matrix = new_graph;
+		Vertices = ver_num;
 		Directed = DirectedCheck();
 	};
 
-	Graph(int choice, string filename = "in.txt");
+	Graph(int choice, string filename = "in.txt"); //choice 1 - cin, 2 - file
 
 	int GetSize();
 	bool IfEulerian();
@@ -35,11 +35,12 @@ public:
 	int* Dijkstra(int);
 	friend std::ostream& operator << (std::ostream&, const Graph&);
 	friend bool operator == (Graph& left, int right[]) {
-		for (int i = 0; i < left.V; i++)
-			for (int j = 0; j < left.V; j++)
-				if (left.G[i][j] != right[i * left.V + j]) return false;
+		for (int i = 0; i < left.Vertices; i++)
+			for (int j = 0; j < left.Vertices; j++)
+				if (left.Graph_Matrix[i][j] != right[i * left.Vertices + j]) return false;
 		return true;
 	}
+
 	Iterator* create_dft_iterator(int); // depth-first traverse iterator
 	Iterator* create_bft_iterator(int); // breadth-first traverse iterator
 
@@ -111,8 +112,8 @@ public:
 	};
 
 	~Graph() {
-		for (size_t i = 0; i < V; i++)
-			free(G[i]);
-		free(G);
+		for (size_t i = 0; i < Vertices; i++)
+			free(Graph_Matrix[i]);
+		free(Graph_Matrix);
 	}
 };

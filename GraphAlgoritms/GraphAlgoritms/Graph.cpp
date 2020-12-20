@@ -8,17 +8,17 @@ Graph::Graph(int choice, string filename) {
 	//choice 1 -> reading from console
 	//choice 2-> reading from file
 	
-	fstream f;
+	fstream file;
 
 	//reading vertices
 	if (choice == 1) {
 		cout << "Number of vertices: ";
-		cin >> V;
+		cin >> Vertices;
 	}
 	else if (choice == 2) {
-		f.open(filename, ios::in);
-		f >> V;
-		if (f.eof() || V == 0) throw std::out_of_range("Graph is empty");
+		file.open(filename, ios::in);
+		file >> Vertices;
+		if (file.eof() || Vertices == 0) throw std::out_of_range("Graph is empty");
 	}
 	else { 
 		cout << "Wrong input. Try again\n"; 
@@ -27,76 +27,76 @@ Graph::Graph(int choice, string filename) {
 	}
 
 	//memory
-	int** p;
-	p = (int**)malloc(sizeof(int*) * V);
-	if (!p) {
+	int** arr_check;
+	arr_check = (int**)malloc(sizeof(int*) * Vertices);
+	if (!arr_check) {
 		throw std::out_of_range("Allocation error");
 		return;
 	}
 	else {
-		G = p;
+		Graph_Matrix = arr_check;
 	}
 
 	//reading graph
 	if (choice == 1) {
-		for (int i = 0; i < V; i++)
+		for (int i = 0; i < Vertices; i++)
 		{
-			p[i] = (int*)malloc(V * sizeof(int));
-			if (!p[i]) { throw std::out_of_range("Allocation error"); return; }
-			else G[i] = p[i];
+			arr_check[i] = (int*)malloc(Vertices * sizeof(int));
+			if (!arr_check[i]) { throw std::out_of_range("Allocation error"); return; }
+			else Graph_Matrix[i] = arr_check[i];
 			//reading
-			for (int j = 0; j < V; j++)
+			for (int j = 0; j < Vertices; j++)
 			{
 				int temp; cin >> temp;
-				if (temp == 0 || temp == 1) G[i][j] = temp;
+				if (temp == 0 || temp == 1) Graph_Matrix[i][j] = temp;
 				else { 
 					throw std::invalid_argument("Input error");
 					for (int k = 0; k < i; k++)
-						free(G[k]);
-					free(G);
-					V = 0; 
+						free(Graph_Matrix[k]);
+					free(Graph_Matrix);
+					Vertices = 0;
 				}
-				if (i == j) G[i][j] = 0;
+				if (i == j) Graph_Matrix[i][j] = 0;
 			}
 		}
 		cout << "Sucessfully read.\n";
 	}
 	else if (choice == 2) {
 		//we believe that people can write input properly i guess
-		for (int i = 0; i < V; i++)
+		for (int i = 0; i < Vertices; i++)
 		{
-			p[i] = (int*)malloc(V * sizeof(int));
-			if (!p[i]) { throw std::out_of_range("Allocation error"); return; }
-			else G[i] = p[i];
+			arr_check[i] = (int*)malloc(Vertices * sizeof(int));
+			if (!arr_check[i]) { throw std::out_of_range("Allocation error"); return; }
+			else Graph_Matrix[i] = arr_check[i];
 			//reading
-			for (int j = 0; j < V; j++)
+			for (int j = 0; j < Vertices; j++)
 			{
-				if (f.eof()) {
+				if (file.eof()) {
 					throw std::invalid_argument("End of file"); 
 				}
-				int temp; f >> temp;
-				if (temp == 0 || temp == 1) G[i][j] = temp;
+				int temp; file >> temp;
+				if (temp == 0 || temp == 1) Graph_Matrix[i][j] = temp;
 				else {
 					throw std::invalid_argument("Input error");
 					for (int k = 0; k < i; k++)
-						free(G[k]);
-					free(G);
-					V = 0;
+						free(Graph_Matrix[k]);
+					free(Graph_Matrix);
+					Vertices = 0;
 				}
-				if (i == j) G[i][j] = 0;
+				if (i == j) Graph_Matrix[i][j] = 0;
 			}
 		}
-		cout << "Sucessfully read." << V << endl;
-		f.close();
+		cout << "Sucessfully read." << Vertices << endl;
+		file.close();
 	}
 	//checking if graph is directed
 	Directed = DirectedCheck();
 }
 
 bool Graph::DirectedCheck() {
-	for (size_t i = 0; i < V; i++)
-		for (size_t j = i; j < V; j++)
-			if (G[i][j] != G[j][i])
+	for (size_t i = 0; i < Vertices; i++)
+		for (size_t j = i; j < Vertices; j++)
+			if (Graph_Matrix[i][j] != Graph_Matrix[j][i])
 				return true;  //symmetry check
 	return false;
 }
@@ -107,8 +107,8 @@ bool Graph::IfCycleNoDir() {
 	}
 	else {
 		Iterator* g_dft_iterator = create_dft_iterator(0);
-		bool* visited = new bool[V];
-		for (size_t i = 0; i < V; i++)
+		bool* visited = new bool[Vertices];
+		for (size_t i = 0; i < Vertices; i++)
 			visited[i] = false;
 		int cur,bef;
 		while (g_dft_iterator->has_next())
@@ -116,8 +116,8 @@ bool Graph::IfCycleNoDir() {
 			bef = g_dft_iterator->beforecur();
 			cur = g_dft_iterator->next();
 			visited[cur] = true;
-			for (size_t i = 0; i < V; i++)
-				if ((G[cur][i] == 1) && (visited[i] == true) && (i != bef)) //we can go to the already visited peak, but not to the previous one 
+			for (size_t i = 0; i < Vertices; i++)
+				if ((Graph_Matrix[cur][i] == 1) && (visited[i] == true) && (i != bef)) //we can go to the already visited peak, but not to the previous one 
 					return true;
 		}
 	}
@@ -142,25 +142,25 @@ bool Graph::IfEulerian() {
 
 	//count
 	int* count_rows, *count_col;
-	count_rows = new int[V];
-	count_col = new int[V];
-	for (int j = 0; j < V; j++) count_col[j] = 0;
-	for (int i = 0; i < V; i++) {
+	count_rows = new int[Vertices];
+	count_col = new int[Vertices];
+	for (int j = 0; j < Vertices; j++) count_col[j] = 0;
+	for (int i = 0; i < Vertices; i++) {
 		count_rows[i] = 0;
-		for (int j = 0; j < V; j++) {
-			if (G[i][j] == 1) { count_rows[i]++; count_col[j]++; }
+		for (int j = 0; j < Vertices; j++) {
+			if (Graph_Matrix[i][j] == 1) { count_rows[i]++; count_col[j]++; }
 		}
 	}
 
-	for (int i = 0; i < V; i++)
+	for (int i = 0; i < Vertices; i++)
 		if (!Directed && (count_col[i] + count_rows[i]) % 2 != 0) return false;
 		else if (Directed && (count_col[i] != count_rows[i])) return false;
 	return true;
 }
 
 bool Graph::IfBipartite() {
-	int* color = new int[V];
-	for (size_t i = 0; i < V; i++)
+	int* color = new int[Vertices];
+	for (size_t i = 0; i < Vertices; i++)
 		color[i] = 2; //1-black,0-white,2-grey
 	Iterator* g_bft_iterator = create_bft_iterator(0);
 	int cur;
@@ -173,8 +173,8 @@ bool Graph::IfBipartite() {
 		}
 		else
 			cur = g_bft_iterator->next();
-		for (size_t i = 0; i < V; i++)
-			if (G[cur][i] == 1)
+		for (size_t i = 0; i < Vertices; i++)
+			if (Graph_Matrix[cur][i] == 1)
 			{
 				switch (color[i])
 				{
@@ -201,11 +201,11 @@ bool Graph::IfTree() {
 	{
 		int countDeg;
 		int count = 0;
-		for (size_t i = 0; i < V; i++)
+		for (size_t i = 0; i < Vertices; i++)
 		{
 			countDeg = 0;
-			for (size_t j = 0; j < V; j++)
-				countDeg += G[j][i];
+			for (size_t j = 0; j < Vertices; j++)
+				countDeg += Graph_Matrix[j][i];
 			if (countDeg>1)  //entry degree greater than 1
 			{
 				return false;
@@ -236,21 +236,21 @@ bool Graph::IfTree() {
 int* Graph::PruferCode() {
 	//code only for not directed trees
 	if (!IfTree() || Directed) throw std::invalid_argument("Invalid Graph Type");
-	if (V <= 2) return NULL;
-	int* PrufC = new int[V - 2]; 
-	int** G_copy = new int*[V];
+	if (Vertices <= 2) return NULL;
+	int* PrufC = new int[Vertices - 2];
+	int** G_copy = new int*[Vertices];
 	//copy the array to work with
-	for (int i = 0; i < V; i++)
+	for (int i = 0; i < Vertices; i++)
 	{
-		G_copy[i] = new int[V];
-		for (int j = 0; j < V; j++)
-			G_copy[i][j] = G[i][j];
+		G_copy[i] = new int[Vertices];
+		for (int j = 0; j < Vertices; j++)
+			G_copy[i][j] = Graph_Matrix[i][j];
 	}
 	
 	int cur_ver = 0, connect_num = 0, next_ver = 0, cur_Pruf = 0;
 	bool exit = false;
-	while (cur_Pruf < V - 2) {
-		for (int j = 0; j < V; j++) { //searching for the smallest 'leaf' with 1 connection
+	while (cur_Pruf < Vertices - 2) {
+		for (int j = 0; j < Vertices; j++) { //searching for the smallest 'leaf' with 1 connection
 			if (G_copy[cur_ver][j] == 1) {
 				connect_num++;
 				if (connect_num > 1) { cur_ver++; exit = true; break; }
@@ -275,47 +275,47 @@ void Graph::PruferDecode(int* PrufC, int Pruf_length) {
 	for (int i = 0; i < Pruf_length; i++)
 		if (PrufC[i] >= Pruf_length + 2) throw std::invalid_argument("Invalid Prufer Code");
 
-	V = Pruf_length + 2;
-	int* ver_num = new int[V];
-	int** p = (int**)malloc(sizeof(int*) * V);
+	Vertices = Pruf_length + 2;
+	int* ver_num = new int[Vertices];
+	int** graph_temp = (int**)malloc(sizeof(int*) * Vertices);
 	int pos = 0, pos_pruf = 0;
 	//two arrays; prufer code and vertices in order
-	for (int i = 0; i < V; i++)
+	for (int i = 0; i < Vertices; i++)
 	{
 		ver_num[i] = i;
-		p[i] = (int*)malloc(V * sizeof(int));
-		for (int j = 0; j < V; j++) p[i][j] = 0;
+		graph_temp[i] = (int*)malloc(Vertices * sizeof(int));
+		for (int j = 0; j < Vertices; j++) graph_temp[i][j] = 0;
 	}
-	for (; pos_pruf < V - 2; pos_pruf++) { 
+	for (; pos_pruf < Vertices - 2; pos_pruf++) {
 		//connecting a vertex from prufer with smallest vertex from other array
 		//second vertex shouldn't be in prufer code
-		for (int i = pos_pruf; i < V - 2; i++) {
+		for (int i = pos_pruf; i < Vertices - 2; i++) {
 			if (ver_num[pos] == PrufC[i] || ver_num[pos] == -1) { i = pos_pruf -1; pos++; }
 		}
-		p[ver_num[pos]][PrufC[pos_pruf]] = 1;
-		p[PrufC[pos_pruf]][ver_num[pos]] = 1;
+		graph_temp[ver_num[pos]][PrufC[pos_pruf]] = 1;
+		graph_temp[PrufC[pos_pruf]][ver_num[pos]] = 1;
 		ver_num[pos] = -1;
 		pos = 0;
 	}
 
 	int row = -1, col = -1;
-	for (int i = 0; i < V; i++)
+	for (int i = 0; i < Vertices; i++)
 		if (ver_num[i] != -1 && row == -1) row = ver_num[i];
 		else if (ver_num[i] != -1) { col = ver_num[i]; break; }
-	p[row][col] = 1; p[col][row] = 1;
-	G = (int**)realloc(G, sizeof(int*) * V);
-	G = p;
+	graph_temp[row][col] = 1; graph_temp[col][row] = 1;
+	Graph_Matrix = (int**)realloc(Graph_Matrix, sizeof(int*) * Vertices);
+	Graph_Matrix = graph_temp;
 }
 
 dualList* Graph::StrongConnected() {
-	int* number = new int[V];
-	bool* visited = new bool[V];
+	int* number = new int[Vertices];
+	bool* visited = new bool[Vertices];
 	Stack* stack = new Stack();
 	int backcur;
 	bool canGo=true;
 	int Icurrent = 0, count = 0,temp;
 	stack->push(Icurrent);
-	for (size_t i = 0; i < V; i++) {
+	for (size_t i = 0; i < Vertices; i++) {
 		number[i] = -1;
 		visited[i] = false;
 	}
@@ -324,8 +324,8 @@ dualList* Graph::StrongConnected() {
 	{
 		visited[Icurrent] = true;
 		temp = Icurrent;
-		for (size_t i = 0; i < V; i++)
-			if ((visited[i] == false) && (G[i][Icurrent] == 1))
+		for (size_t i = 0; i < Vertices; i++)
+			if ((visited[i] == false) && (Graph_Matrix[i][Icurrent] == 1))
 			{
 				Icurrent = i;
 				stack->push(Icurrent);
@@ -348,8 +348,8 @@ dualList* Graph::StrongConnected() {
 		while ((temp == Icurrent) && !stack->isEmpty())
 		{
 			backcur = stack->pop();
-			for (size_t i = 0; i < V; i++)
-				if ((visited[i] == false) && (G[i][backcur] == 1))
+			for (size_t i = 0; i < Vertices; i++)
+				if ((visited[i] == false) && (Graph_Matrix[i][backcur] == 1))
 				{
 					Icurrent = i;
 					stack->push(backcur);
@@ -373,7 +373,7 @@ dualList* Graph::StrongConnected() {
 		}
 		if (temp == Icurrent)
 		{
-			for (size_t i = 0; i < V; i++)
+			for (size_t i = 0; i < Vertices; i++)
 				if (visited[i] == false)
 				{
 					Icurrent = i;
@@ -385,14 +385,14 @@ dualList* Graph::StrongConnected() {
 		if (!stack->isEmpty())
 			canGo = true;
 		else {
-			for (size_t i = 0; i < V; i++)
+			for (size_t i = 0; i < Vertices; i++)
 				if (visited[i] == false) {
 					canGo = true;
 					break;
 				}
 		}
 	}
-	for (size_t i = 0; i < V; i++) {
+	for (size_t i = 0; i < Vertices; i++) {
 		visited[i] = false;
 	}
 	canGo = true;
@@ -400,12 +400,12 @@ dualList* Graph::StrongConnected() {
 
 	Icurrent = number[count-1];  //starting with the last one on the way out
 	stack->clear();
-	dualList* Result = new dualList[V];
+	dualList* Result = new dualList[Vertices];
 	stack->push(Icurrent);
 	while (canGo)  //number the vertices upon exit
 	{
 		visited[Icurrent] = true;
-		for (size_t i = 0; i < V; i++)
+		for (size_t i = 0; i < Vertices; i++)
 			if (number[i] == Icurrent)
 			{
 				Result[countSv].push_back(Icurrent);  //add to list
@@ -413,8 +413,8 @@ dualList* Graph::StrongConnected() {
 				break;
 			}
 		temp = Icurrent;
-		for (size_t i = 0; i < V; i++)
-			if ((visited[i] == false) && (G[Icurrent][i] == 1))
+		for (size_t i = 0; i < Vertices; i++)
+			if ((visited[i] == false) && (Graph_Matrix[Icurrent][i] == 1))
 			{
 				Icurrent = i;
 				stack->push(Icurrent);
@@ -423,8 +423,8 @@ dualList* Graph::StrongConnected() {
 		while ((temp == Icurrent) && !stack->isEmpty())
 		{
 			backcur = stack->pop();
-			for (size_t i = 0; i < V; i++)
-				if ((visited[i] == false) && (G[backcur][i] == 1))
+			for (size_t i = 0; i < Vertices; i++)
+				if ((visited[i] == false) && (Graph_Matrix[backcur][i] == 1))
 				{
 					Icurrent = i;
 					stack->push(backcur);
@@ -434,7 +434,7 @@ dualList* Graph::StrongConnected() {
 		}
 		if (temp == Icurrent)
 		{
-			for (int i = V-1; i >= 0; i--)
+			for (int i = Vertices -1; i >= 0; i--)
 				if (number[i] != -1)  //we go to the next not visited from the last one on the way out
 				{
 					if (visited[number[i]] == false)
@@ -450,7 +450,7 @@ dualList* Graph::StrongConnected() {
 		if (!stack->isEmpty())
 			canGo = true;
 		else {
-			for (size_t i = 0; i < V; i++)
+			for (size_t i = 0; i < Vertices; i++)
 				if (visited[i] == false) {
 					canGo = true;
 					break;
@@ -461,37 +461,37 @@ dualList* Graph::StrongConnected() {
 }
 
 int Graph::GetSize() {
-	return V;
+	return Vertices;
 }
 
-int* Graph::Dijkstra(int A) {  
-	int* distance = new int[V];
-	bool* visited = new bool[V];
+int* Graph::Dijkstra(int start_point) {  
+	int* distance = new int[Vertices];
+	bool* visited = new bool[Vertices];
 	
-	int** G_copy = new int* [V];
-	for (int i = 0; i < V; i++)
+	int** G_copy = new int* [Vertices];
+	for (int i = 0; i < Vertices; i++)
 	{
-		G_copy[i] = new int[V];
-		for (int j = 0; j < V; j++)
-			if (G[i][j] == 0)
+		G_copy[i] = new int[Vertices];
+		for (int j = 0; j < Vertices; j++)
+			if (Graph_Matrix[i][j] == 0)
 			{
 				G_copy[i][j] = INT_MAX;
 			}
 			else {
-				G_copy[i][j] = G[i][j];
+				G_copy[i][j] = Graph_Matrix[i][j];
 			}
 	}
 
-	for (size_t i = 0; i < V; i++) {
-		distance[i] = G_copy[A][i];
+	for (size_t i = 0; i < Vertices; i++) {
+		distance[i] = G_copy[start_point][i];
 		visited[i] = false;
 	}
 	int u=0,index=0,min;
-	distance[A] = 0;
-	for (size_t i = 0; i < V; i++)
+	distance[start_point] = 0;
+	for (size_t i = 0; i < Vertices; i++)
 	{
 		min = INT_MAX;
-		for (size_t j = 0; j < V; j++)
+		for (size_t j = 0; j < Vertices; j++)
 		{
 			if ((visited[j]==false)&&(distance[j]<min))  //finding a shortcut
 			{
@@ -501,7 +501,7 @@ int* Graph::Dijkstra(int A) {
 		}
 		u = index;
 		visited[u] = true;
-		for (size_t j = 0; j < V; j++)
+		for (size_t j = 0; j < Vertices; j++)
 		{
 			if ((visited[j]==false)&&(G_copy[u][j]!=INT_MAX) && (distance[u] != INT_MAX) &&((distance[u]+G_copy[u][j]) < distance[j])) //if shorter bypass
 			{
@@ -510,7 +510,7 @@ int* Graph::Dijkstra(int A) {
 		}
 	}
 
-	for (size_t i = 0; i < V; i++)
+	for (size_t i = 0; i < Vertices; i++)
 	{
 		delete G_copy[i];
 	}
@@ -519,14 +519,14 @@ int* Graph::Dijkstra(int A) {
 }
 
 Iterator* Graph::create_dft_iterator(int start = 0) {
-	return new dft_Iterator(G,V,start);
+	return new dft_Iterator(Graph_Matrix, Vertices,start);
 }
 
 std::ostream& operator << (std::ostream& out, const Graph& Gr) {
 	cout << "Graph: " << endl;
-	for (int i = 0; i < Gr.V; i++) {
-		for (int j = 0; j < Gr.V; j++) {
-			cout << Gr.G[i][j] << " ";
+	for (int i = 0; i < Gr.Vertices; i++) {
+		for (int j = 0; j < Gr.Vertices; j++) {
+			cout << Gr.Graph_Matrix[i][j] << " ";
 		}
 		cout << endl;
 	}
@@ -596,7 +596,7 @@ bool  Graph::dft_Iterator::newconnection() {
 }
 
 Iterator* Graph::create_bft_iterator(int start = 0) {
-	return new bft_Iterator(G, V, start);
+	return new bft_Iterator(Graph_Matrix, Vertices, start);
 }
 
 bool Graph::bft_Iterator::has_next() {
