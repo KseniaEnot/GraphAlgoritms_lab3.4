@@ -123,6 +123,16 @@ bool Graph::IfCycleNoDir() {
 	}
 	return false;
 }
+void Graph::TrZam() {
+	for (size_t w = 0; w < Vertices; w++)
+		for (size_t u = 0; u < Vertices; u++)
+			for (size_t v = 0; v < Vertices; v++)
+				if ((Graph_Matrix[u][w] == 1) && (Graph_Matrix[w][v] == 1) && (Graph_Matrix[u][v] == 0))
+				{
+					//cout << "For w=" << w + 1 << " add (" << u + 1 << "," << v + 1 << ")" << endl;
+					Graph_Matrix[u][v] = 1;
+				}
+}
 
 bool Graph::IfEulerian() {
 	//check for connections

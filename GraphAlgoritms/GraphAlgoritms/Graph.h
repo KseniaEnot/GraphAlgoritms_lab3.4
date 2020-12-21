@@ -30,6 +30,7 @@ public:
 	bool IfBipartite();
 	bool IfTree();
 	int* PruferCode();
+	void TrZam();
 	void PruferDecode(int*, int);
 	dualList* StrongConnected();
 	int* Dijkstra(int);
